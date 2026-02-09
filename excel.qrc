@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/excel">
+        <file>report.xlsx</file>
+        <file>Reports/Report.xlsx</file>
+    </qresource>
+</RCC>
