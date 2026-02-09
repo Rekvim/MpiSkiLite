@@ -29,25 +29,6 @@ void setNum(QLineEdit* le, double v, int prec = 2)
     le->setText(QString::number(v, 'f', prec));
 }
 
-std::optional<QPair<double,double>> parseRange2(const QString& s)
-{
-    static const QRegularExpression re(R"(([+-]?\d+(?:[.,]\d+)?))");
-    auto it = re.globalMatch(s);
-
-    double a = 0.0, b = 0.0;
-    int n = 0;
-    while (it.hasNext() && n < 2) {
-        const auto m = it.next();
-        bool ok = false;
-        const double v = toDouble(m.captured(1), &ok);
-        if (!ok) continue;
-        if (n == 0) a = v; else b = v;
-        ++n;
-    }
-    if (n == 2) return QPair<double,double>(a, b);
-    return std::nullopt;
-}
-
 void setPlusMinusPercent(QLineEdit* loLe, QLineEdit* hiLe,
                          double base, double pct, int prec = 2)
 {
@@ -453,7 +434,6 @@ void MainWindow::lockTabsForPreInit()
     ui->tabWidget->setTabEnabled(1, false);
     ui->tabWidget->setTabEnabled(2, false);
     ui->tabWidget->setTabEnabled(3, false);
-    // ui->tabWidget->setTabEnabled(4, false);
 }
 
 QTabWidget* MainWindow::currentInnerTabWidget() const

@@ -31,6 +31,10 @@ public:
     QString templatePath() const { return QStringLiteral(":/excel/Reports/Report.xlsx"); }
 
 private:
+    QString m_sheetStepReactionTest = "ТШР";
+    QString m_sheetGraphsOptionalTests = "Графики Опц Тестов";
+    QString m_sheetTechnicalInspection = "ТО";
+
     QString resultOk(CrossingStatus::State state) const {
         using State = CrossingStatus::State;
         switch (state) {
