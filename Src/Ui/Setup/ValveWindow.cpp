@@ -412,7 +412,7 @@ void ValveWindow::loadToUi(const ValveInfo& v)
     ui->lineEdit_crossingLimits_coefficientFriction_upperLimit->setText(
         QString::number(v.crossingLimits.frictionCoefUpperLimit, 'f', 2));
 
-    ui->lineEdit_crossingLimits_linearCharacteristic_lowerLimit->setText(
+    ui->lineEdit_crossingLimits_linearCharacteristic_ыlowerLimit->setText(
         QString::number(v.crossingLimits.linearCharacteristicLowerLimit, 'f', 2));
 
     ui->lineEdit_crossingLimits_range_lowerLimit->setText(
@@ -426,6 +426,12 @@ void ValveWindow::loadToUi(const ValveInfo& v)
 
 void ValveWindow::positionChanged(const QString &position)
 {
+    if (position == kManualInput) {
+        ui->lineEdit_positionNumber->clear();
+        ui->lineEdit_positionNumber->setEnabled(true);
+        return;
+    }
+
     if (m_registry->loadValveInfo(position)) {
         m_local = m_registry->valveInfo();
         loadToUi(m_local);

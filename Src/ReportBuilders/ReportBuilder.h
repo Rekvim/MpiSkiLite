@@ -14,18 +14,18 @@ public:
     ~ReportBuilder() = default;
 
     void buildReport(
-        ReportSaver::Report& report,
-        const TelemetryStore& telemetryStore,
-        const ObjectInfo& objectInfo,
-        const ValveInfo& valveInfo,
-        const OtherParameters& otherParams,
-        const MaterialsOfComponentParts& materialsOfComponentParts,
-        const QImage& imageChartTask = QImage(),
-        const QImage& imageChartPressure = QImage(),
-        const QImage& imageChartFriction = QImage(),
-        const QImage& imageChartResponse = QImage(),
-        const QImage& imageChartResolution = QImage(),
-        const QImage& imageChartStep = QImage()
+        ReportSaver::Report &report,
+        const TelemetryStore &telemetryStore,
+        const ObjectInfo &objectInfo,
+        const ValveInfo &valveInfo,
+        const OtherParameters &otherParams,
+        const MaterialsOfComponentParts &materialsOfComponentParts,
+        const QImage &imageChartTask = QImage(),
+        const QImage &imageChartPressure = QImage(),
+        const QImage &imageChartFriction = QImage(),
+        const QImage &imageChartResponse = QImage(),
+        const QImage &imageChartResolution = QImage(),
+        const QImage &imageChartStep = QImage()
         );
 
     QString templatePath() const { return QStringLiteral(":/excel/Reports/Report.xlsx"); }
@@ -55,18 +55,18 @@ private:
         return {};
     }
 
-    void cell(ReportSaver::Report& report,
-              const QString& sheet,
+    void cell(ReportSaver::Report &report,
+              const QString &sheet,
               quint16 row, quint16 col,
-              const QVariant& value)
+              const QVariant &value)
     {
         report.data.push_back({sheet, row, col, value.toString()});
     }
 
-    void image(ReportSaver::Report& report,
-               const QString& sheet,
+    void image(ReportSaver::Report &report,
+               const QString &sheet,
                quint16 row, quint16 col,
-               const QImage& img)
+               const QImage &img)
     {
         report.images.push_back({sheet, row, col, img});
     }

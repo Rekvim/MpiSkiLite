@@ -1,18 +1,18 @@
 #include "./Src/ReportBuilders/ReportBuilder.h"
 
 void ReportBuilder::buildReport(
-    ReportSaver::Report& report,
-    const TelemetryStore& telemetryStore,
-    const ObjectInfo& objectInfo,
-    const ValveInfo& valveInfo,
-    const OtherParameters& otherParams,
-    const MaterialsOfComponentParts& materialsOfComponentParts,
-    const QImage& imageChartTask,
-    const QImage& imageChartPressure,
-    const QImage& imageChartFriction,
-    const QImage& imageChartResponse,
-    const QImage& imageChartResolution,
-    const QImage& imageChartStep
+    ReportSaver::Report &report,
+    const TelemetryStore &telemetryStore,
+    const ObjectInfo &objectInfo,
+    const ValveInfo &valveInfo,
+    const OtherParameters &otherParams,
+    const MaterialsOfComponentParts &materialsOfComponentParts,
+    const QImage &imageChartTask,
+    const QImage &imageChartPressure,
+    const QImage &imageChartFriction,
+    const QImage &imageChartResponse,
+    const QImage &imageChartResolution,
+    const QImage &imageChartStep
     ) {
 
     cell(report, m_sheetStepReactionTest, 1, 9, valveInfo.positionNumber);
