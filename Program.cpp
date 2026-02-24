@@ -145,7 +145,7 @@ void Program::updateSensors()
         switch (i) {
         case 0:
             emit setText(TextObjects::LineEdit_linearSensor, m_mpi[i]->formattedValue());
-            emit setText(TextObjects::LineEdit_linearSensorPercent, m_mpi[i]->formattedValue());
+            emit setText(TextObjects::LineEdit_linearSensorPercent, m_mpi[i]->percentFormatted());
             break;
         case 1:
             emit setText(TextObjects::LineEdit_pressureSensor_1, m_mpi[i]->formattedValue());

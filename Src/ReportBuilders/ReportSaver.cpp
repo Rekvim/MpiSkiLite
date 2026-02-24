@@ -121,9 +121,16 @@ bool ReportSaver::saveReport(const Report &report, const QString &templatePath)
 
     // 3. Валидации
     for (const auto &v : report.validation) {
+
+        if (!xlsx.selectSheet(v.sheet)) {
+            qWarning() << "Не найден лист" << v.sheet << "для validation!";
+            continue;
+        }
+
         DataValidation validation(DataValidation::List,
                                   DataValidation::Equal,
                                   v.formula);
+
         validation.addRange(v.range);
         xlsx.addDataValidation(validation);
     }

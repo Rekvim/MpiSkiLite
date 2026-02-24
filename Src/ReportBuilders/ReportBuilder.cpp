@@ -126,12 +126,21 @@ void ReportBuilder::buildReport(
         QString("%1")
             .arg(telemetryStore.mainTestRecord.frictionForce, 0, 'f', 3)
     );
+
+    validation(report, m_sheetTechnicalInspection, "=Заключение!$B$1:$B$4", "E41");
+    validation(report, m_sheetTechnicalInspection, "=Заключение!$C$1:$C$3", "E43");
+    validation(report, m_sheetTechnicalInspection, "=Заключение!$E$1:$E$4", "E45");
+    validation(report, m_sheetTechnicalInspection, "=Заключение!$D$1:$D$5", "E47");
+    validation(report, m_sheetTechnicalInspection, "=Заключение!$F$3", "E49");
+
     cell(report,
         m_sheetTechnicalInspection, 51, 5, telemetryStore.strokeTestRecord.timeForwardMs
     );
     cell(report,
         m_sheetTechnicalInspection, 51, 8, telemetryStore.strokeTestRecord.timeBackwardMs
     );
+
+    validation(report, m_sheetTechnicalInspection, "=ЗИП!$A$1:$A$37", "J55:J64");
 
     // Дата и Исполнитель
     cell(report, m_sheetTechnicalInspection, 65, 12, otherParams.date);
@@ -155,10 +164,5 @@ void ReportBuilder::buildReport(
     // Страница: Отчет; Блок: Дата
     cell(report, m_sheetGraphsOptionalTests, 80, 12, otherParams.date);
 
-    report.validation.push_back({"=ЗИП!$A$1:$A$37", "J56:J65"});
-    report.validation.push_back({"=Заключение!$B$1:$B$4", "E42"});
-    report.validation.push_back({"=Заключение!$C$1:$C$3", "E44"});
-    report.validation.push_back({"=Заключение!$E$1:$E$4", "E46"});
-    report.validation.push_back({"=Заключение!$D$1:$D$5", "E48"});
-    report.validation.push_back({"=Заключение!$F$3", "E50"});
+
 }

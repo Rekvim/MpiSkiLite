@@ -63,6 +63,14 @@ private:
         report.data.push_back({sheet, row, col, value.toString()});
     }
 
+    void validation(ReportSaver::Report &report,
+              const QString &sheet,
+              const QString &formula,
+              const QString &range)
+    {
+        report.validation.push_back({sheet, formula, range});
+    }
+
     void image(ReportSaver::Report &report,
                const QString &sheet,
                quint16 row, quint16 col,

@@ -68,7 +68,6 @@ private slots:
 
     void getDirectory(const QString &currentPath, QString &result);
 
-
     void updateCrossingIndicators();
 
     void setText(TextObjects object, const QString &text);

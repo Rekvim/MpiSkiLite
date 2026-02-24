@@ -29,6 +29,7 @@ public:
     };
 
     struct ValidationData {
+        QString sheet;
         QString formula;
         QString range;
     };
