@@ -1,7 +1,5 @@
-#ifndef REGISTRY_H
-#define REGISTRY_H
-
 #pragma once
+
 #include <QDate>
 #include <QObject>
 #include <QSettings>
@@ -136,5 +134,3 @@ private:
 
     OtherParameters m_otherParameters;
 };
-
-#endif // REGISTRY_H

@@ -1,4 +1,11 @@
-#include "./Src/ReportBuilders/ReportBuilder.h"
+#include "Src/ReportBuilders/ReportBuilder.h"
+#include "Src/ReportBuilders/ReportWriter.h"
+
+#include "Src/ReportBuilders/ReportBlocks/ObjectInfoBlock.h"
+#include "Src/ReportBuilders/ReportBlocks/ValveSpecBlock.h"
+#include "Src/ReportBuilders/ReportBlocks/MaterialsBlock.h"
+#include "Src/ReportBuilders/ReportBlocks/StepReactionBlock.h"
+#include "Src/ReportBuilders/ReportBlocks/TechnicalResultsBlock.h"
 
 void ReportBuilder::buildReport(
     ReportSaver::Report &report,
@@ -13,156 +20,70 @@ void ReportBuilder::buildReport(
     const QImage &imageChartResponse,
     const QImage &imageChartResolution,
     const QImage &imageChartStep
-    ) {
+    )
+{ // 168
+    ReportWriter writer(report);
 
-    cell(report, m_sheetStepReactionTest, 1, 9, valveInfo.positionNumber);
+    ReportContext ctx{
+        telemetryStore,
+        objectInfo,
+        valveInfo,
+        otherParams,
+        materialsOfComponentParts,
+        imageChartTask,
+        imageChartPressure,
+        imageChartFriction,
+        imageChartStep
+    };
 
-    // Лист: Результат теста шаговой реакции; Страница: 2; Блок: Данные по объекту
-    cell(report, m_sheetStepReactionTest, 4, 4, objectInfo.object);
-    cell(report, m_sheetStepReactionTest, 5, 4, objectInfo.manufactory);
-    cell(report, m_sheetStepReactionTest, 6, 4, objectInfo.department);
+    writer.cell(m_sheetStepReactionTest, 1, 9, ctx.valve.positionNumber);
 
-    // Страница:Результат теста шаговой реакции; Блок: Краткая спецификация на клапан
-    cell(report, m_sheetStepReactionTest, 4, 13, valveInfo.positionNumber);
-    cell(report, m_sheetStepReactionTest, 5, 13, valveInfo.serialNumber);
-    cell(report, m_sheetStepReactionTest, 6, 13, valveInfo.valveModel);
-    cell(report, m_sheetStepReactionTest, 7, 13, valveInfo.manufacturer);
-    cell(report, m_sheetStepReactionTest, 8, 13, QString("%1 / %2").arg(valveInfo.DN, valveInfo.PN));
-    cell(report, m_sheetStepReactionTest, 9, 13, valveInfo.positionerModel);
-    cell(report, m_sheetStepReactionTest, 10, 13, QString("%1")
-                                      .arg(telemetryStore.supplyRecord.pressure_bar, 0, 'f', 2));
-    cell(report, m_sheetStepReactionTest, 11, 13, otherParams.safePosition);
-    cell(report, m_sheetStepReactionTest, 12, 13, valveInfo.driveModel);
-    cell(report, m_sheetStepReactionTest, 13, 13, otherParams.strokeMovement);
-    cell(report, m_sheetStepReactionTest, 14, 13, valveInfo.materialStuffingBoxSeal);
+    ObjectInfoBlock({m_sheetStepReactionTest, 4, 4}).build(writer, ctx);
+    ValveSpecBlock({m_sheetStepReactionTest, 4, 13}).build(writer, ctx);
+    StepReactionBlock({m_sheetStepReactionTest, 18, 2, 55}).build(writer, ctx);
 
-    // Страница: Результат теста шаговой реакции; Блок: График теста шаговой реакции
-    report.images.push_back({m_sheetStepReactionTest, 18, 2, imageChartStep});
+    writer.cell(m_sheetStepReactionTest, 76, 12, ctx.params.date);
 
-    // Страница: Результат теста шаговой реакции; Блок: Результат теста шаговой реакции
-    {
-        quint16 row = 55;
-        for (auto &sr : telemetryStore.stepResults) {
-            cell(report, m_sheetStepReactionTest, row, 3, QString("%1->%2").arg(sr.from).arg(sr.to));
-            cell(report, m_sheetStepReactionTest, row, 4, QTime(0,0).addMSecs(sr.T_value).toString("m:ss.zzz"));
-            cell(report, m_sheetStepReactionTest, row, 5, QString("%1").arg(sr.overshoot, 0, 'f', 2));
-            ++row;
-        }
-    }
+    ObjectInfoBlock({m_sheetTechnicalInspection, 5, 4}).build(writer, ctx);
+    ValveSpecBlock({m_sheetTechnicalInspection, 5, 13}).build(writer, ctx);
+    MaterialsBlock({m_sheetTechnicalInspection, 11, 4})
+        .build(writer, ctx);
 
-    // Страница: Отчет ЦТ; Блок: Дата
-    cell(report, m_sheetStepReactionTest, 76, 12, otherParams.date);
+    TechnicalResultsBlock({m_sheetTechnicalInspection,
+                              29, // rowStart
+                              5, // colFact
+                              8, // colNorm
+                              11, // colResult
+                              51 // rowStrokeTime
+                          }).build(writer, ctx);
 
-    // Страница: Отчет; Блок: Данные по объекту
-    cell(report, m_sheetTechnicalInspection, 5, 4, objectInfo.object);
-    cell(report, m_sheetTechnicalInspection, 6, 4, objectInfo.manufactory);
-    cell(report, m_sheetTechnicalInspection, 7, 4, objectInfo.department);
+    writer.validation(m_sheetTechnicalInspection, "=Заключение!$B$1:$B$4", "E41");
+    writer.validation(m_sheetTechnicalInspection, "=Заключение!$C$1:$C$3", "E43");
+    writer.validation(m_sheetTechnicalInspection, "=Заключение!$E$1:$E$4", "E45");
+    writer.validation(m_sheetTechnicalInspection, "=Заключение!$D$1:$D$5", "E47");
+    writer.validation(m_sheetTechnicalInspection, "=Заключение!$F$3", "E49");
 
-    // Страница:Отчет; Блок: Краткая спецификация на клапан
-    cell(report, m_sheetTechnicalInspection, 5, 13, valveInfo.positionNumber);
-    cell(report, m_sheetTechnicalInspection, 6, 13, valveInfo.serialNumber);
-    cell(report, m_sheetTechnicalInspection, 7, 13, valveInfo.valveModel);
-    cell(report, m_sheetTechnicalInspection, 8, 13, valveInfo.manufacturer);
-    cell(report, m_sheetTechnicalInspection, 9, 13, QString("%1 / %2").arg(valveInfo.DN, valveInfo.PN));
-    cell(report, m_sheetTechnicalInspection, 10, 13, valveInfo.positionerModel);
-    cell(report, m_sheetTechnicalInspection, 11, 13, QString("%1").arg(telemetryStore.supplyRecord.pressure_bar, 0, 'f', 2));
-    cell(report, m_sheetTechnicalInspection, 12, 13, otherParams.safePosition);
-    cell(report, m_sheetTechnicalInspection, 13, 13, valveInfo.driveModel);
-    cell(report, m_sheetTechnicalInspection, 14, 13, otherParams.strokeMovement);
-    cell(report, m_sheetTechnicalInspection, 15, 13, valveInfo.materialStuffingBoxSeal);
-
-    // Материал деталей
-    report.data.push_back({m_sheetTechnicalInspection, 11, 4, materialsOfComponentParts.corpus});
-    report.data.push_back({m_sheetTechnicalInspection, 12, 4, materialsOfComponentParts.cap});
-    report.data.push_back({m_sheetTechnicalInspection, 13, 4, materialsOfComponentParts.saddle});
-    report.data.push_back({m_sheetTechnicalInspection, 13, 6, materialsOfComponentParts.CV});
-    report.data.push_back({m_sheetTechnicalInspection, 14, 4, materialsOfComponentParts.ball});
-    report.data.push_back({m_sheetTechnicalInspection, 15, 4, materialsOfComponentParts.disk});
-    report.data.push_back({m_sheetTechnicalInspection, 16, 4, materialsOfComponentParts.plunger});
-    report.data.push_back({m_sheetTechnicalInspection, 17, 4, materialsOfComponentParts.shaft});
-    report.data.push_back({m_sheetTechnicalInspection, 18, 4, materialsOfComponentParts.stock});
-    report.data.push_back({m_sheetTechnicalInspection, 19, 4, materialsOfComponentParts.guideSleeve});
-
-    // Страница: Отчет; Блок: Результат испытаний
-    cell(report, m_sheetTechnicalInspection, 29, 5,
-         QString("%1")
-             .arg(telemetryStore.mainTestRecord.dynamicErrorReal, 0, 'f', 2));
-
-    cell(report, m_sheetTechnicalInspection, 29, 8,
-         QString("%1")
-             .arg(valveInfo.dinamicErrorRecomend, 0, 'f', 2));
-    cell(report, m_sheetTechnicalInspection, 29, 11, resultOk(telemetryStore.crossingStatus.dynamicError));
-
-    cell(report, m_sheetTechnicalInspection, 31, 5, QString("%1")
-                                     .arg(telemetryStore.valveStrokeRecord.real, 0, 'f', 2));
-    cell(report, m_sheetTechnicalInspection, 31, 8, valveInfo.strokValve);
-    cell(report, m_sheetTechnicalInspection, 31, 11, resultOk(telemetryStore.crossingStatus.range));
-
-    cell(report, m_sheetTechnicalInspection, 33, 5,
-         QString("%1–%2")
-             .arg(telemetryStore.mainTestRecord.springLow, 0, 'f', 2)
-             .arg(telemetryStore.mainTestRecord.springHigh, 0, 'f', 2)
-         );
-    cell(report, m_sheetTechnicalInspection, 33, 11, resultOk(telemetryStore.crossingStatus.spring));
-    cell(report, m_sheetTechnicalInspection, 33, 8,
-        QString("%1–%2")
-            .arg(valveInfo.driveRangeLow, 0, 'f', 2)
-            .arg(valveInfo.driveRangeHigh, 0, 'f', 2)
-    );
-
-    cell(report, m_sheetTechnicalInspection, 35, 5,
-        QString("%1–%2")
-            .arg(telemetryStore.mainTestRecord.lowLimitPressure, 0, 'f', 2)
-            .arg(telemetryStore.mainTestRecord.highLimitPressure, 0, 'f', 2)
-    );
-
-    cell(report, m_sheetTechnicalInspection, 37, 5,
-        QString("%1")
-            .arg(telemetryStore.mainTestRecord.frictionPercent, 0, 'f', 2)
-    );
-    cell(report, m_sheetTechnicalInspection, 37, 11, resultLimit(telemetryStore.crossingStatus.frictionPercent));
-
-    cell(report, m_sheetTechnicalInspection, 39, 5,
-        QString("%1")
-            .arg(telemetryStore.mainTestRecord.frictionForce, 0, 'f', 3)
-    );
-
-    validation(report, m_sheetTechnicalInspection, "=Заключение!$B$1:$B$4", "E41");
-    validation(report, m_sheetTechnicalInspection, "=Заключение!$C$1:$C$3", "E43");
-    validation(report, m_sheetTechnicalInspection, "=Заключение!$E$1:$E$4", "E45");
-    validation(report, m_sheetTechnicalInspection, "=Заключение!$D$1:$D$5", "E47");
-    validation(report, m_sheetTechnicalInspection, "=Заключение!$F$3", "E49");
-
-    cell(report,
-        m_sheetTechnicalInspection, 51, 5, telemetryStore.strokeTestRecord.timeForwardMs
-    );
-    cell(report,
-        m_sheetTechnicalInspection, 51, 8, telemetryStore.strokeTestRecord.timeBackwardMs
-    );
-
-    validation(report, m_sheetTechnicalInspection, "=ЗИП!$A$1:$A$37", "J55:J64");
+    writer.validation(m_sheetTechnicalInspection, "=ЗИП!$A$1:$A$37", "J55:J64");
 
     // Дата и Исполнитель
-    cell(report, m_sheetTechnicalInspection, 65, 12, otherParams.date);
-    cell(report, m_sheetTechnicalInspection, 73, 4, objectInfo.FIO);
+    writer.cell(m_sheetTechnicalInspection, 65, 12, ctx.params.date);
+    writer.cell(m_sheetTechnicalInspection, 73, 4, ctx.object.FIO);
 
     // Страница: Отчет; Блок: Диагностические графики
-    image(report, m_sheetTechnicalInspection, 83, 1, imageChartTask);
-    image(report, m_sheetTechnicalInspection, 108, 1, imageChartPressure);
-    image(report, m_sheetTechnicalInspection, 133, 1, imageChartFriction);
+    writer.image(m_sheetTechnicalInspection, 83, 1, imageChartTask);
+    writer.image(m_sheetTechnicalInspection, 108, 1, imageChartPressure);
+    writer.image(m_sheetTechnicalInspection, 133, 1, imageChartFriction);
 
     // Страница: Отчет; Блок: Дата
-    cell(report, m_sheetTechnicalInspection, 158, 12, otherParams.date);
+    writer.cell(m_sheetTechnicalInspection, 158, 12, ctx.params.date);
 
     // Страница: Отчет; Блок: Диагностические графики
-    cell(report, m_sheetGraphsOptionalTests, 1, 13, valveInfo.positionNumber);
+    writer.cell(m_sheetGraphsOptionalTests, 1, 13, ctx.valve.positionNumber);
 
-    image(report, m_sheetGraphsOptionalTests, 5, 1, imageChartResponse);
-    image(report, m_sheetGraphsOptionalTests, 30, 1, imageChartResolution);
-    image(report, m_sheetGraphsOptionalTests, 55, 1, imageChartStep);
+    writer.image(m_sheetGraphsOptionalTests, 5, 1, imageChartResponse);
+    writer.image(m_sheetGraphsOptionalTests, 30, 1, imageChartResolution);
+    writer.image(m_sheetGraphsOptionalTests, 55, 1, imageChartStep);
 
     // Страница: Отчет; Блок: Дата
-    cell(report, m_sheetGraphsOptionalTests, 80, 12, otherParams.date);
-
-
+    writer.cell(m_sheetGraphsOptionalTests, 80, 12, ctx.params.date);
 }

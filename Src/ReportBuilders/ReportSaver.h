@@ -1,6 +1,3 @@
-#ifndef REPORTSAVER_H
-#define REPORTSAVER_H
-
 #pragma once
 
 #include <QObject>
@@ -58,5 +55,3 @@ signals:
     void question(const QString &title, const QString &text, bool &result);
     void getDirectory(const QString &currentPath, QString &result);
 };
-
-#endif // REPORTSAVER_H

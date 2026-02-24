@@ -1,12 +1,20 @@
-#ifndef REPORTBUILDER_H
-#define REPORTBUILDER_H
-
 #pragma once
+
 #include "ReportSaver.h"
 #include "./Src/Telemetry/TelemetryStore.h"
 #include "./Registry.h"
 
-#include <QWidget>
+struct ReportContext {
+    const TelemetryStore& telemetry;
+    const ObjectInfo& object;
+    const ValveInfo& valve;
+    const OtherParameters& params;
+    const MaterialsOfComponentParts& materials;
+    const QImage& chartTask;
+    const QImage& chartPressure;
+    const QImage& chartFriction;
+    const QImage& chartStep;
+};
 
 class ReportBuilder {
 public:
@@ -34,50 +42,4 @@ private:
     QString m_sheetStepReactionTest = "ТШР";
     QString m_sheetGraphsOptionalTests = "Графики Опц Тестов";
     QString m_sheetTechnicalInspection = "ТО";
-
-    QString resultOk(CrossingStatus::State state) const {
-        using State = CrossingStatus::State;
-        switch (state) {
-        case State::Ok: return "соответствует";
-        case State::Fail: return "не соответствует";
-        case State::Unknown: return "не определено";
-        }
-        return {};
-    }
-
-    QString resultLimit(CrossingStatus::State state) const {
-        using State = CrossingStatus::State;
-        switch (state) {
-        case State::Ok: return "не превышает";
-        case State::Fail: return "превышает";
-        case State::Unknown: return "не определено";
-        }
-        return {};
-    }
-
-    void cell(ReportSaver::Report &report,
-              const QString &sheet,
-              quint16 row, quint16 col,
-              const QVariant &value)
-    {
-        report.data.push_back({sheet, row, col, value.toString()});
-    }
-
-    void validation(ReportSaver::Report &report,
-              const QString &sheet,
-              const QString &formula,
-              const QString &range)
-    {
-        report.validation.push_back({sheet, formula, range});
-    }
-
-    void image(ReportSaver::Report &report,
-               const QString &sheet,
-               quint16 row, quint16 col,
-               const QImage &img)
-    {
-        report.images.push_back({sheet, row, col, img});
-    }
 };
-
-#endif // REPORTBUILDER_H

@@ -18,6 +18,7 @@ include(./QXlsx.pri)
 INCLUDEPATH += $$PWD/Src/CustomChart
 
 SOURCES += \
+    Src/ReportBuilders/ReportBlocks/TechnicalResultsBlock.cpp \
     main.cpp \
     Src/Ui/Setup/ObjectWindow.cpp \
     Src/Ui/Setup/ValveWindow.cpp \
@@ -55,6 +56,13 @@ SOURCES += \
     Sensor.cpp
 
 HEADERS += \
+    Src/ReportBuilders/ReportBlocks/IReportBlock.h \
+    Src/ReportBuilders/ReportBlocks/MaterialsBlock.h \
+    Src/ReportBuilders/ReportBlocks/ObjectInfoBlock.h \
+    Src/ReportBuilders/ReportBlocks/StepReactionBlock.h \
+    Src/ReportBuilders/ReportBlocks/TechnicalResultsBlock.h \
+    Src/ReportBuilders/ReportBlocks/ValveSpecBlock.h \
+    Src/ReportBuilders/ReportWriter.h \
     Src/Ui/Setup/ObjectWindow.h \
     Src/Ui/Setup/ValveWindow.h \
     Src/Ui/Setup/SelectTests.h \

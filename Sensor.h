@@ -1,7 +1,5 @@
-#ifndef SENSOR_H
-#define SENSOR_H
-
 #pragma once
+
 #include <QObject>
 
 class Sensor : public QObject
@@ -33,5 +31,3 @@ private:
     qreal m_k = 1.0;
     qreal m_b = 0.0;
 };
-
-#endif // SENSOR_H
