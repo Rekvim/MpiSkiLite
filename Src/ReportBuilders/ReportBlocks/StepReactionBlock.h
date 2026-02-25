@@ -12,7 +12,7 @@ struct StepReactionLayout {
 class StepReactionBlock : public IReportBlock {
 public:
     explicit StepReactionBlock(StepReactionLayout layout)
-        : m_layout(layout) {}
+        : m_layout(std::move(layout)) {}
 
     void build(ReportWriter& writer,
                const ReportContext& ctx) override

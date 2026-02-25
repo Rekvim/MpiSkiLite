@@ -11,7 +11,7 @@ struct ObjectInfoLayout {
 class ObjectInfoBlock : public IReportBlock {
 public:
     explicit ObjectInfoBlock(ObjectInfoLayout layout)
-        : m_layout(layout) {}
+        : m_layout(std::move(layout)) {}
 
     void build(ReportWriter& writer,
                const ReportContext& ctx) override

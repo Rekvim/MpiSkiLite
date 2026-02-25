@@ -14,7 +14,7 @@ public:
         quint16 rowStrokeTime; // 48
     };
 
-    explicit TechnicalResultsBlock(Layout l) : m(l) {}
+    explicit TechnicalResultsBlock(Layout layout) : m_layout(std::move(layout)) {}
 
     void build(ReportWriter& w, const ReportContext& ctx) const;
 
@@ -22,5 +22,5 @@ private:
     QString resultOk(CrossingStatus::State state) const;
     QString resultLimit(CrossingStatus::State state) const;
 
-    Layout m;
+    Layout m_layout;
 };

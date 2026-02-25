@@ -11,7 +11,7 @@ struct ValveSpecLayout {
 class ValveSpecBlock : public IReportBlock {
 public:
     explicit ValveSpecBlock(ValveSpecLayout layout)
-        : m_layout(layout) {}
+        : m_layout(std::move(layout)) {}
 
     void build(ReportWriter& writer,
                const ReportContext& ctx) override
