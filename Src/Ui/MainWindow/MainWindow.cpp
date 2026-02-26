@@ -135,7 +135,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->tabWidget->setCurrentIndex(0);
 
-    lockTabsForPreInit();
+    // lockTabsForPreInit();
 
     m_mainTestSettings = new MainTestSettings(this);
     m_stepTestSettings = new StepTestSettings(this);
@@ -430,10 +430,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::lockTabsForPreInit()
 {
-    ui->tabWidget->setTabEnabled(ui->tabWidget->indexOf(ui->tab_mainTests), false);
-    ui->tabWidget->setTabEnabled(1, false);
-    ui->tabWidget->setTabEnabled(2, false);
-    ui->tabWidget->setTabEnabled(3, false);
+    // ui->tabWidget->setTabEnabled(ui->tabWidget->indexOf(ui->tab_mainTests), false);
+    // ui->tabWidget->setTabEnabled(1, false);
+    // ui->tabWidget->setTabEnabled(2, false);
+    // ui->tabWidget->setTabEnabled(3, false);
 }
 
 QTabWidget* MainWindow::currentInnerTabWidget() const
