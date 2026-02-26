@@ -40,9 +40,15 @@ void ReportBuilder::buildReport(
 
     ObjectInfoBlock({m_sheetStepReactionTest, 4, 4}).build(writer, ctx);
     ValveSpecBlock({m_sheetStepReactionTest, 4, 13}).build(writer, ctx);
-    StepReactionBlock({m_sheetStepReactionTest, 18, 2, 55}).build(writer, ctx);
+    StepReactionBlock({m_sheetStepReactionTest,
+                          18,  // imageRow
+                          2,   // imageCol
+                          55,  // startRow
+                          3,   // firstBaseCol
+                          10   // secondBaseCol
+                      }).build(writer, ctx);
 
-    writer.cell(m_sheetStepReactionTest, 76, 12, ctx.params.date);
+    writer.cell(m_sheetStepReactionTest, 67, 12, ctx.params.date);
 
     ObjectInfoBlock({m_sheetTechnicalInspection, 5, 4}).build(writer, ctx);
     ValveSpecBlock({m_sheetTechnicalInspection, 5, 13}).build(writer, ctx);
@@ -70,20 +76,20 @@ void ReportBuilder::buildReport(
     writer.cell(m_sheetTechnicalInspection, 73, 4, ctx.object.FIO);
 
     // Страница: Отчет; Блок: Диагностические графики
-    writer.image(m_sheetTechnicalInspection, 83, 1, imageChartTask);
-    writer.image(m_sheetTechnicalInspection, 108, 1, imageChartPressure);
-    writer.image(m_sheetTechnicalInspection, 133, 1, imageChartFriction);
+    writer.image(m_sheetTechnicalInspection, 84, 1, imageChartTask);
+    writer.image(m_sheetTechnicalInspection, 112, 1, imageChartPressure);
+    writer.image(m_sheetTechnicalInspection, 140, 1, imageChartFriction);
 
     // Страница: Отчет; Блок: Дата
-    writer.cell(m_sheetTechnicalInspection, 158, 12, ctx.params.date);
+    writer.cell(m_sheetTechnicalInspection, 165, 12, ctx.params.date);
 
-    // Страница: Отчет; Блок: Диагностические графики
-    writer.cell(m_sheetGraphsOptionalTests, 1, 13, ctx.valve.positionNumber);
+    // // Страница: Отчет; Блок: Диагностические графики
+    // writer.cell(m_sheetGraphsOptionalTests, 1, 13, ctx.valve.positionNumber);
 
-    writer.image(m_sheetGraphsOptionalTests, 5, 1, imageChartResponse);
-    writer.image(m_sheetGraphsOptionalTests, 30, 1, imageChartResolution);
-    writer.image(m_sheetGraphsOptionalTests, 55, 1, imageChartStep);
+    // writer.image(m_sheetGraphsOptionalTests, 5, 1, imageChartResponse);
+    // writer.image(m_sheetGraphsOptionalTests, 30, 1, imageChartResolution);
+    // writer.image(m_sheetGraphsOptionalTests, 55, 1, imageChartStep);
 
-    // Страница: Отчет; Блок: Дата
-    writer.cell(m_sheetGraphsOptionalTests, 80, 12, ctx.params.date);
+    // // Страница: Отчет; Блок: Дата
+    // writer.cell(m_sheetGraphsOptionalTests, 80, 12, ctx.params.date);
 }
