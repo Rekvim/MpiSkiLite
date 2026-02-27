@@ -422,6 +422,9 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->tabWidget_optionalTests->setCurrentIndex(0);
                 ui->tabWidget_reportGeneration->setCurrentIndex(0);
             });
+
+    connect(ui->lineEdit_supplyPressure, &QLineEdit::textChanged,
+            this, &MainWindow::onSupplyPressureEdited);
 }
 
 MainWindow::~MainWindow()
@@ -434,6 +437,18 @@ MainWindow::~MainWindow()
     m_programThread->wait();
 
     delete ui;
+}
+
+void MainWindow::onSupplyPressureEdited()
+{
+    bool ok = false;
+    const double value = toDouble(ui->lineEdit_supplyPressure->text(), &ok);
+
+    if (ok) {
+        m_telemetryStore.supplyRecord.pressure_bar = value;
+    } else {
+        m_telemetryStore.supplyRecord.pressure_bar = 0.0;
+    }
 }
 
 void MainWindow::lockTabsForPreInit()
@@ -504,9 +519,7 @@ void MainWindow::onTotalTestTimeMs(quint64 totalMs)
     m_totalTestMs = totalMs;
     m_elapsedTimer.restart();
 
-    ui->statusbar->showMessage(
-        tr("Плановая длительность теста: %1").arg(formatHMS(m_totalTestMs))
-        );
+    ui->statusbar->showMessage(tr("Плановая длительность теста: %1").arg(formatHMS(m_totalTestMs)));
 
     m_durationTimer->setInterval(1000);
     m_durationTimer->start();
