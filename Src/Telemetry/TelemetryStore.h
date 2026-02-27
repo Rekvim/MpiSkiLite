@@ -11,15 +11,15 @@
 
 struct InitState {
     QString deviceStatusText = "";
-    QColor  deviceStatusColor = QColor();
+    QColor deviceStatusColor = QColor();
     QString initStatusText = "";
-    QColor  initStatusColor = QColor();
+    QColor initStatusColor = QColor();
     QString connectedSensorsText = "";
-    QColor  connectedSensorsColor = QColor();
+    QColor connectedSensorsColor = QColor();
     QString startingPositionText = "";
-    QColor  startingPositionColor = QColor();
+    QColor startingPositionColor = QColor();
     QString finalPositionText = "";
-    QColor  finalPositionColor = QColor();
+    QColor finalPositionColor = QColor();
 };
 
 struct StepTestRecord {
@@ -92,28 +92,29 @@ struct SupplyRecord {
 class TelemetryStore {
 public:
     InitState init;
-    QVector<StepTestRecord> stepResults = {
-        {0, 5, 120, 0.15},
-        {5, 10, 118, 0.12},
-        {10, 15, 122, 0.18},
-        {15, 20, 119, 0.10},
-        {20, 25, 121, 0.14},
-        {25, 30, 117, 0.09},
-        {30, 35, 123, 0.20},
-        {35, 40, 116, 0.08},
-        {40, 45, 124, 0.22},
-        {45, 50, 118, 0.11},
-        {50, 55, 125, 0.25},
-        {55, 60, 119, 0.13},
-        {60, 65, 126, 0.27},
-        {65, 70, 120, 0.16},
-        {70, 75, 127, 0.30},
-        {75, 80, 121, 0.17},
-        {80, 85, 128, 0.32},
-        {85, 90, 122, 0.19},
-        {90, 95, 129, 0.35},
-        {95, 100, 123, 0.21}
-    };
+    // QVector<StepTestRecord> stepResults = {
+    //     {0, 5, 120, 0.15},
+    //     {5, 10, 118, 0.12},
+    //     {10, 15, 122, 0.18},
+    //     {15, 20, 119, 0.10},
+    //     {20, 25, 121, 0.14},
+    //     {25, 30, 117, 0.09},
+    //     {30, 35, 123, 0.20},
+    //     {35, 40, 116, 0.08},
+    //     {40, 45, 124, 0.22},
+    //     {45, 50, 118, 0.11},
+    //     {50, 55, 125, 0.25},
+    //     {55, 60, 119, 0.13},
+    //     {60, 65, 126, 0.27},
+    //     {65, 70, 120, 0.16},
+    //     {70, 75, 127, 0.30},
+    //     {75, 80, 121, 0.17},
+    //     {80, 85, 128, 0.32},
+    //     {85, 90, 122, 0.19},
+    //     {90, 95, 129, 0.35},
+    //     {95, 100, 123, 0.21}
+    // };
+    QVector<StepTestRecord> stepResults;
     StrokeTestRecord strokeTestRecord;
     ValveStrokeRecord valveStrokeRecord;
     SupplyRecord supplyRecord;

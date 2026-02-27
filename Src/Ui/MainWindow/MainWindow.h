@@ -22,6 +22,14 @@
 namespace Ui { class MainWindow; }
 // QT_END_NAMESPACE
 
+enum class TestState {
+    Idle,          // ничего не происходит
+    Starting,      // подготовка, диалог параметров
+    Running,       // тест выполняется
+    Finished,      // успешно завершён
+    Canceled       // отменён пользователем
+};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -132,10 +140,11 @@ private:
     TelemetryStore m_telemetryStore;
 
     QPlainTextEdit* m_logOutput = nullptr;
+    void setTestState(TestState state);
 
-    bool m_isUserCanceled = false;
-    bool m_isTestRunning = false;
     bool m_isInitialized = false;
+
+    TestState m_testState = TestState::Idle;
 
     void lockTabsForPreInit();
     void updateAvailableTabs();

@@ -7,6 +7,8 @@ OptionTest::OptionTest(QObject *parent, bool endTestAfterProcess)
 
 void OptionTest::Process()
 {
+    emit started();
+
     if (m_task.value.empty()) {
         emit EndTest();
         return;

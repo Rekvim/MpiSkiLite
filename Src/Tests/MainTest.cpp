@@ -7,6 +7,7 @@ MainTest::MainTest(QObject *parent, bool endTestAfterProcess)
 
 void MainTest::Process()
 {
+    emit started();
     emit ClearGraph();
     emit ShowDots(!m_parameters.continuous);
 

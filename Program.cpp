@@ -39,8 +39,6 @@ Program::Program(QObject *parent)
     connect(m_timerSensors, &QTimer::timeout,
             this, &Program::updateSensors);
 
-    m_isTestRunning = false;
-
     // m_timerDI = new QTimer(this);
     // m_timerDI->setInterval(1000);
     // connect(m_timerDI, &QTimer::timeout, this, [&]() {
@@ -158,7 +156,7 @@ void Program::updateSensors()
             break;
         }
     }
-    if (m_isTestRunning)
+    if (m_activeRunner)
         emit setTask(m_mpi.dac()->value());
 
     Sensor *feedbackSensor = m_mpi.dac();
@@ -184,13 +182,17 @@ void Program::updateSensors()
 
 void Program::endTest()
 {
-    m_isTestRunning = false;
     emit setTaskControlsEnabled(true);
     emit setButtonInitEnabled(true);
 
     emit setTask(m_mpi.dac()->value());
 
+    const bool hadRunner = (m_activeRunner != nullptr);
+
     m_activeRunner.reset();
+
+    if (hadRunner)
+        emit testReallyFinished();
 
     emit testFinished();
 }
@@ -443,6 +445,7 @@ void Program::finalizeInitialization()
     m_initTime = QDateTime::currentMSecsSinceEpoch();
 
     emit setSensorNumber(m_mpi.sensorCount());
+    emit setTaskControlsEnabled(true);
     emit setButtonInitEnabled(true);
 
     m_timerSensors->start();
@@ -454,33 +457,12 @@ bool Program::isInitialized() const {
 
 void Program::startMainTest()
 {
-    auto runner = std::make_unique<MainTestRunner>(m_mpi, *m_registry, this);
+    auto r = std::make_unique<MainTestRunner>(m_mpi, *m_registry, this);
 
-    connect(runner.get(), &AbstractTestRunner::requestSetDAC,
-            this, &Program::setDacRaw);
-
-    connect(this, &Program::releaseBlock,
-            runner.get(), &AbstractTestRunner::releaseBlock);
-
-    connect(runner.get(), &MainTestRunner::getParameters_mainTest,
+    connect(r.get(), &MainTestRunner::getParameters_mainTest,
             this, &Program::forwardGetParameters_mainTest);
 
-    connect(runner.get(), &AbstractTestRunner::totalTestTimeMs,
-            this, &Program::totalTestTimeMs);
-
-    connect(runner.get(), &AbstractTestRunner::endTest,
-            this, &Program::endTest);
-
-    connect(this, &Program::stopTheTest,
-            runner.get(), &AbstractTestRunner::stop);
-
-    emit setButtonInitEnabled(false);
-    emit setTaskControlsEnabled(false);
-
-    m_isTestRunning = true;
-
-    m_activeRunner = std::move(runner);
-    m_activeRunner->start();
+    startRunner(std::move(r));
 }
 
 void Program::receivedPoints_mainTest(QVector<QVector<QPointF>> &points)

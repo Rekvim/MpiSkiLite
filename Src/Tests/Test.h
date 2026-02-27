@@ -37,5 +37,6 @@ signals:
                 bool waitForStart = false);
     void UpdateGraph();
     void EndTest();
+    void started();
 };
 #endif // TEST_H

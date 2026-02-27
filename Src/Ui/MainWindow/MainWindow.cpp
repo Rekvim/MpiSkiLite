@@ -135,7 +135,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->tabWidget->setCurrentIndex(0);
 
-    // lockTabsForPreInit();
+    lockTabsForPreInit();
 
     m_mainTestSettings = new MainTestSettings(this);
     m_stepTestSettings = new StepTestSettings(this);
@@ -315,9 +315,17 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::getDirectory,
             Qt::DirectConnection);
 
+    connect(m_program, &Program::testStarted,
+            this, &MainWindow::startTest);
+
     connect(ui->checkBox_autoinit, &QCheckBox::checkStateChanged,
             this, [&](int state) {
                 ui->pushButton_set->setEnabled(!state);
+            });
+
+    connect(m_program, &Program::testActuallyStarted,
+            this, [this]() {
+                setTestState(TestState::Running);
             });
 
     ui->tableWidget_stepResults->setColumnCount(2);
@@ -401,7 +409,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onTelemetryUpdated,
             Qt::QueuedConnection);
 
-    connect(m_program, &Program::testFinished,
+    connect(m_program, &Program::testReallyFinished,
             this, &MainWindow::endTest);
 
     ui->tabWidget_mainTests->setCurrentIndex(0);
@@ -430,10 +438,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::lockTabsForPreInit()
 {
-    // ui->tabWidget->setTabEnabled(ui->tabWidget->indexOf(ui->tab_mainTests), false);
-    // ui->tabWidget->setTabEnabled(1, false);
-    // ui->tabWidget->setTabEnabled(2, false);
-    // ui->tabWidget->setTabEnabled(3, false);
+    ui->tabWidget->setTabEnabled(ui->tabWidget->indexOf(ui->tab_mainTests), false);
+    ui->tabWidget->setTabEnabled(1, false);
+    ui->tabWidget->setTabEnabled(2, false);
+    ui->tabWidget->setTabEnabled(3, false);
 }
 
 QTabWidget* MainWindow::currentInnerTabWidget() const
@@ -1217,34 +1225,67 @@ void MainWindow::getDirectory(const QString &currentPath, QString &result)
 
 void MainWindow::startTest()
 {
-    m_isTestRunning = true;
-    ui->statusbar->showMessage(tr("Тест в процессе"));
+    setTestState(TestState::Starting);
 }
 
 void MainWindow::endTest()
 {
-    m_isTestRunning = false;
-
-    ui->statusbar->showMessage(tr("Тест завершён"));
+    const TestState prevState = m_testState;
 
     if (m_durationTimer)
         m_durationTimer->stop();
 
-    promptSaveChartsAfterTest();
+    if (prevState == TestState::Running) {
+        setTestState(TestState::Finished);
+        promptSaveChartsAfterTest();
+    }
+    else if (prevState == TestState::Canceled) {
+        setTestState(TestState::Idle);
+    }
+    else {
+        setTestState(TestState::Idle);
+    }
+}
+
+void MainWindow::setTestState(TestState state)
+{
+    m_testState = state;
+
+    switch (state) {
+    case TestState::Idle:
+        ui->statusbar->showMessage(tr("Готов к запуску теста"));
+        break;
+
+    case TestState::Starting:
+        ui->statusbar->showMessage(tr("Настройка параметров теста..."));
+        break;
+
+    case TestState::Running:
+        ui->statusbar->showMessage(tr("Тест в процессе"));
+        break;
+
+    case TestState::Finished:
+        ui->statusbar->showMessage(tr("Тест завершён"));
+        break;
+
+    case TestState::Canceled:
+        ui->statusbar->showMessage(tr("Тест отменён пользователем"));
+        break;
+    }
 }
 
 void MainWindow::on_pushButton_mainTest_start_clicked()
 {
-    if (m_isTestRunning ) {
+    if (m_testState == TestState::Running ||
+        m_testState == TestState::Starting)
+    {
         if (QMessageBox::question(this, tr("Внимание!"), tr("Вы действительно хотите завершить тест?"))
         == QMessageBox::Yes) {
-            m_isUserCanceled = true;
+            setTestState(TestState::Canceled);
             emit stopTest();
         }
     } else {
-        m_isUserCanceled = false;
         emit runMainTest();
-        startTest();
     }
 }
 void MainWindow::on_pushButton_mainTest_save_clicked()
@@ -1260,14 +1301,16 @@ void MainWindow::on_pushButton_mainTest_save_clicked()
 
 void MainWindow::on_pushButton_strokeTest_start_clicked()
 {
-    if (m_isTestRunning ) {
+    if (m_testState == TestState::Running ||
+        m_testState == TestState::Starting)
+    {
         if (QMessageBox::question(this, tr("Внимание!"), tr("Вы действительно хотите завершить тест?"))
             == QMessageBox::Yes) {
+            setTestState(TestState::Canceled);
             emit stopTest();
         }
     } else {
         emit runStrokeTest();
-        startTest();
     }
 }
 void MainWindow::on_pushButton_strokeTest_save_clicked()
@@ -1277,14 +1320,16 @@ void MainWindow::on_pushButton_strokeTest_save_clicked()
 
 void MainWindow::on_pushButton_optionalTests_start_clicked()
 {
-    if (m_isTestRunning ) {
+    if (m_testState == TestState::Running ||
+        m_testState == TestState::Starting)
+    {
         if (QMessageBox::question(this, tr("Внимание!"), tr("Вы действительно хотите завершить тест?"))
             == QMessageBox::Yes) {
+            setTestState(TestState::Canceled);
             emit stopTest();
         }
     } else {
         emit runOptionalTest(ui->tabWidget_optionalTests->currentIndex());
-        startTest();
     }
 }
 void MainWindow::on_pushButton_optionalTests_save_clicked()
@@ -1586,9 +1631,6 @@ MainWindow::SeriesVisibilityBackup MainWindow::hidePressureAuxSeries()
 
 void MainWindow::promptSaveChartsAfterTest()
 {
-    if (m_isUserCanceled)
-        return;
-
     const auto charts = chartsForCurrentTest();
     if (charts.isEmpty())
         return;

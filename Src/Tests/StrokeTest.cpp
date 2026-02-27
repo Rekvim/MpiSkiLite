@@ -39,6 +39,7 @@ StrokeTest::StrokeTest(QObject *parent)
 
 void StrokeTest::Process()
 {
+    emit started();
     setDacBlocked(0, 10000, true);
 
     if (m_terminate) {

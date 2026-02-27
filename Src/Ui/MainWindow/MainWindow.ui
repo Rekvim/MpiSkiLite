@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1219</width>
-    <height>957</height>
+    <height>960</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -53,7 +53,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_manual">
        <attribute name="title">
@@ -3216,7 +3216,7 @@ Border-radius: 10px;
         <item>
          <widget class="QTabWidget" name="tabWidget_optionalTests">
           <property name="currentIndex">
-           <number>3</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_optionalTests_response">
            <attribute name="title">
@@ -3502,7 +3502,7 @@ Border-radius: 10px;
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget_reportGeneration">
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="tab_info">
            <attribute name="title">
@@ -4269,7 +4269,7 @@ Border-radius: 10px;
                      </font>
                     </property>
                     <property name="readOnly">
-                     <bool>true</bool>
+                     <bool>false</bool>
                     </property>
                     <property name="clearButtonEnabled">
                      <bool>false</bool>
@@ -5220,10 +5220,10 @@ Border-radius: 10px;
                  </font>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::FocusPolicy::NoFocus</enum>
+                 <enum>Qt::FocusPolicy::StrongFocus</enum>
                 </property>
                 <property name="readOnly">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -5242,10 +5242,10 @@ Border-radius: 10px;
                  </font>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::FocusPolicy::NoFocus</enum>
+                 <enum>Qt::FocusPolicy::StrongFocus</enum>
                 </property>
                 <property name="readOnly">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -5264,13 +5264,13 @@ Border-radius: 10px;
                  </font>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::FocusPolicy::NoFocus</enum>
+                 <enum>Qt::FocusPolicy::StrongFocus</enum>
                 </property>
                 <property name="text">
                  <string>0.2–1.0</string>
                 </property>
                 <property name="readOnly">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -5289,10 +5289,10 @@ Border-radius: 10px;
                  </font>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::FocusPolicy::NoFocus</enum>
+                 <enum>Qt::FocusPolicy::StrongFocus</enum>
                 </property>
                 <property name="readOnly">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -5311,10 +5311,10 @@ Border-radius: 10px;
                  </font>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::FocusPolicy::NoFocus</enum>
+                 <enum>Qt::FocusPolicy::StrongFocus</enum>
                 </property>
                 <property name="readOnly">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -5333,10 +5333,10 @@ Border-radius: 10px;
                  </font>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::FocusPolicy::NoFocus</enum>
+                 <enum>Qt::FocusPolicy::StrongFocus</enum>
                 </property>
                 <property name="readOnly">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -5355,10 +5355,10 @@ Border-radius: 10px;
                  </font>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::FocusPolicy::NoFocus</enum>
+                 <enum>Qt::FocusPolicy::StrongFocus</enum>
                 </property>
                 <property name="readOnly">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -5404,10 +5404,10 @@ Border-radius: 10px;
                  </font>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::FocusPolicy::NoFocus</enum>
+                 <enum>Qt::FocusPolicy::StrongFocus</enum>
                 </property>
                 <property name="readOnly">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -5426,10 +5426,10 @@ Border-radius: 10px;
                  </font>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::FocusPolicy::NoFocus</enum>
+                 <enum>Qt::FocusPolicy::StrongFocus</enum>
                 </property>
                 <property name="readOnly">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -5448,10 +5448,10 @@ Border-radius: 10px;
                  </font>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::FocusPolicy::NoFocus</enum>
+                 <enum>Qt::FocusPolicy::StrongFocus</enum>
                 </property>
                 <property name="readOnly">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -5585,10 +5585,10 @@ Border-radius: 10px;
                  </font>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::FocusPolicy::NoFocus</enum>
+                 <enum>Qt::FocusPolicy::StrongFocus</enum>
                 </property>
                 <property name="readOnly">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -5664,10 +5664,10 @@ Border-radius: 10px;
                  </font>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::FocusPolicy::NoFocus</enum>
+                 <enum>Qt::FocusPolicy::StrongFocus</enum>
                 </property>
                 <property name="readOnly">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -5686,10 +5686,10 @@ Border-radius: 10px;
                  </font>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::FocusPolicy::NoFocus</enum>
+                 <enum>Qt::FocusPolicy::StrongFocus</enum>
                 </property>
                 <property name="readOnly">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>

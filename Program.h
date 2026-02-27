@@ -83,6 +83,9 @@ signals:
 
     void errorOccured(const QString&);
 
+    void testReallyFinished();
+    void testStarted();
+    void testActuallyStarted();
 
     void setText(const TextObjects object, const QString &text);
     void setTextColor(const TextObjects object, const QColor color);
@@ -139,7 +142,8 @@ private:
         connect(r.get(), &AbstractTestRunner::requestClearChart, this, [this](int chart){
             emit clearPoints(static_cast<Charts>(chart));
         });
-
+        connect(r.get(), &AbstractTestRunner::testActuallyStarted,
+                this, &Program::testActuallyStarted);
         connect(r.get(), &AbstractTestRunner::requestSetDAC,
                 this, &Program::setDacRaw);
 
@@ -156,10 +160,10 @@ private:
                 r.get(), &AbstractTestRunner::stop);
 
         emit setButtonInitEnabled(false);
-        m_isTestRunning = true;
         emit setTaskControlsEnabled(false);
 
         m_activeRunner = std::move(r);
+        emit testStarted();
         m_activeRunner->start();
     }
 
@@ -196,7 +200,6 @@ private:
     QEventLoop *m_dacEventLoop;
 
     bool m_isInitialized = false;
-    bool m_isTestRunning = false;
     bool m_isDacStopRequested;
     bool m_shouldWaitForButton = false;
     // QVector<bool> m_initialDoStates;

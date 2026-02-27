@@ -28,6 +28,9 @@ void BaseRunner::start() {
     m_thread = new QThread(this);
     m_worker->moveToThread(m_thread);
 
+    connect(m_worker, &Test::started,
+            this, &BaseRunner::testActuallyStarted);
+
     connect(m_thread, &QThread::started,
             m_worker, &Test::Process);
 
