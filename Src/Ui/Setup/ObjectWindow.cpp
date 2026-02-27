@@ -65,7 +65,7 @@ void ObjectWindow::ButtonClick()
     // Проверки в БД (QSettings)
     if (!m_registry->checkObject(ui->lineEdit_object->text())) {
         auto button = QMessageBox::question(this, "Предупреждение",
-                                            "Объекта нет в базе. Вы действительно хотите продождить?");
+                                            "Объекта нет в базе. Вы действительно хотите продолжить?");
         if (button == QMessageBox::Yes) {
             saveToRegistry();
             accept();
@@ -78,7 +78,7 @@ void ObjectWindow::ButtonClick()
 
     if (!m_registry->checkManufactory(ui->lineEdit_manufactory->text())) {
         auto button = QMessageBox::question(this, "Предупреждение",
-                                            "Цеха нет в базе. Вы действительно хотите продождить?");
+                                            "Цеха нет в базе. Вы действительно хотите продолжить?");
         if (button == QMessageBox::Yes) {
             saveToRegistry();
             accept();
@@ -90,7 +90,7 @@ void ObjectWindow::ButtonClick()
 
     if (!m_registry->checkDepartment(ui->lineEdit_department->text())) {
         auto button = QMessageBox::question(this, "Предупреждение",
-                                            "Отделения/установки нет в базе. Вы действительно хотите продождить?");
+                                            "Отделения/установки нет в базе. Вы действительно хотите продолжить?");
         if (button == QMessageBox::Yes) {
             saveToRegistry();
             accept();

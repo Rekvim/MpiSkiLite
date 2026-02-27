@@ -35,6 +35,7 @@ private:
     ValveInfo m_local;
     MaterialsOfComponentParts m_materialsLocal;
 
+    void applyFrictionLimitsFromStuffingBoxSeal();
     void readMaterialsFromUi(MaterialsOfComponentParts& m);
     void loadMaterialsToUi(const MaterialsOfComponentParts& m);
 

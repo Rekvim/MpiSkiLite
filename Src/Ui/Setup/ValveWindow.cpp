@@ -127,6 +127,14 @@ ValveWindow::ValveWindow(QWidget *parent)
     connect(ui->comboBox_positionerType, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &ValveWindow::onPositionerTypeChanged);
 
+    connect(ui->comboBox_materialStuffingBoxSeal, &QComboBox::currentTextChanged,
+            this, [this](const QString&) {
+                applyFrictionLimitsFromStuffingBoxSeal();
+            });
+
+    // Чтобы сразу выставить по текущему значению при открытии окна:
+    applyFrictionLimitsFromStuffingBoxSeal();
+
     onPositionerTypeChanged(ui->comboBox_positionerType->currentIndex());
 
     ui->lineEdit_pulleyDiameter->setText(m_diameter[0]);
@@ -208,6 +216,37 @@ void ValveWindow::setRegistry(Registry *registry)
         this, &ValveWindow::positionChanged);
 }
 
+void ValveWindow::applyFrictionLimitsFromStuffingBoxSeal()
+{
+    const QString seal = ui->comboBox_materialStuffingBoxSeal->currentText().trimmed();
+
+    // Маппинг: материал -> диапазон (%)
+    // Если строки в комбобоксе отличаются (например "PTFE (тефлон)"),
+    // замени сравнение на contains(...) или приведи варианты.
+    double lo = 0.0;
+    double hi = 0.0;
+    bool known = true;
+
+    if (seal == "PTFE") {
+        lo = 1.0;
+        hi = 9.0;
+    } else if (seal == "Graphite") {
+        lo = 8.0;
+        hi = 15.0;
+    } else {
+        known = false;
+    }
+
+    if (!known)
+        return; // ничего не трогаем, если неизвестное значение
+
+    ui->lineEdit_crossingLimits_coefficientFriction_lowerLimit
+        ->setText(QString::number(lo, 'f', 2));
+
+    ui->lineEdit_crossingLimits_coefficientFriction_upperLimit
+        ->setText(QString::number(hi, 'f', 2));
+}
+
 void ValveWindow::saveValveInfo()
 {
     readFromUi(m_local);
@@ -249,6 +288,14 @@ void ValveWindow::loadMaterialsToUi(const MaterialsOfComponentParts& m)
 
     ui->comboBox_materialStuffingBoxSeal
         ->setCurrentText(m.stuffingBoxSeal);
+
+    {
+        QSignalBlocker b(ui->comboBox_materialStuffingBoxSeal);
+        ui->comboBox_materialStuffingBoxSeal->setCurrentText(m.stuffingBoxSeal);
+    }
+
+    // гарантированно применяем после установки
+    applyFrictionLimitsFromStuffingBoxSeal();
 }
 
 void ValveWindow::readFromUi(ValveInfo& v)

@@ -67,6 +67,21 @@ struct Point
     qreal Y;
 };
 
+enum class ProgramState {
+    Disconnected,
+    Connecting,
+    Initializing,
+    Ready,
+    Running,
+    Stopping,
+    Error
+};
+
+struct ProgramStateInfo {
+    ProgramState state = ProgramState::Disconnected;
+    QString message;
+};
+
 class Program : public QObject
 {
     Q_OBJECT
@@ -80,6 +95,8 @@ public:
 signals:
     void realtimeUpdated(const RealtimeState& s);
     void telemetryUpdated(const TelemetryStore &store);
+
+    void programStateChanged(const ProgramStateInfo& info);
 
     void errorOccured(const QString&);
 
@@ -128,6 +145,9 @@ signals:
 
 private:
     SelectTests::PatternType m_patternType;
+
+    ProgramState m_state = ProgramState::Disconnected;
+    void setState(ProgramState s, QString msg = QString());
 
     inline qreal calcPercent(qreal value, bool invert = false) {
         qreal percent = ((value - 4.0) / 16.0) * 100.0;

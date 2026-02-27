@@ -23,11 +23,11 @@ namespace Ui { class MainWindow; }
 // QT_END_NAMESPACE
 
 enum class TestState {
-    Idle,          // ничего не происходит
-    Starting,      // подготовка, диалог параметров
-    Running,       // тест выполняется
-    Finished,      // успешно завершён
-    Canceled       // отменён пользователем
+    Idle, // ничего не происходит
+    Starting, // подготовка, диалог параметров
+    Running, // тест выполняется
+    Finished, // успешно завершён
+    Canceled // отменён пользователем
 };
 
 class MainWindow : public QMainWindow

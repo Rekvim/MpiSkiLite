@@ -30,6 +30,8 @@ Program::Program(QObject *parent)
     : QObject{parent}
 {
     qRegisterMetaType<RealtimeState>("RealtimeState");
+    qRegisterMetaType<ProgramState>("ProgramState");
+    qRegisterMetaType<ProgramStateInfo>("ProgramStateInfo");
 
     m_timerSensors = new QTimer(this);
     m_timerSensors->setInterval(200);
@@ -49,6 +51,27 @@ Program::Program(QObject *parent)
     // connect(&m_mpi, &MPI::errorOccured,
     //         this, &Program::errorOccured,
     //         Qt::QueuedConnection);
+}
+
+void Program::setState(ProgramState s, QString msg)
+{
+    if (msg.isEmpty()) {
+        switch (s) {
+        case ProgramState::Disconnected: msg = "Нет подключения"; break;
+        case ProgramState::Connecting: msg = "Подключение к устройству..."; break;
+        case ProgramState::Initializing: msg = "Инициализация устройства..."; break;
+        case ProgramState::Ready: msg = "Готов к запуску теста"; break;
+        case ProgramState::Running: msg = "Тест выполняется"; break;
+        case ProgramState::Stopping: msg = "Остановка теста..."; break;
+        case ProgramState::Error: msg = "Ошибка"; break;
+        }
+    }
+
+    if (m_state == s) {
+    }
+
+    m_state = s;
+    emit programStateChanged(ProgramStateInfo{ s, msg });
 }
 
 void Program::setRegistry(Registry *registry)
@@ -214,6 +237,7 @@ void Program::setDAC_real(qreal value)
 
 void Program::initialization()
 {
+    setState(ProgramState::Initializing, "Инициализация устройства...");
     auto &ts = m_telemetryStore;
 
     ts.init.initStatusText = "";
