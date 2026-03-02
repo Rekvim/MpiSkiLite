@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>864</width>
+    <width>870</width>
     <height>786</height>
    </rect>
   </property>
@@ -36,7 +36,7 @@
       <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_data">
       <property name="sizePolicy">
@@ -813,6 +813,11 @@
               <string>ПП</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>i/p преобразователь</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item>
@@ -837,6 +842,11 @@
             <item>
              <property name="text">
               <string>2.5</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Без позиционера</string>
              </property>
             </item>
            </widget>

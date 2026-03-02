@@ -33,6 +33,70 @@ static QString pointStr(const QVector<QPointF>& pts, int idx)
 
 // ======================================================================
 
+static int findLastAtLevelBeforeLeaving(const QVector<QPointF>& pts,
+                                        int startIdx,
+                                        double levelThr,
+                                        bool atOrBelowLevel,
+                                        int minStable = 3)
+{
+    // Ищем "последнюю точку на уровне" перед тем, как сигнал уйдёт с уровня.
+    // minStable: чтобы не ловить одиночный шум.
+
+    auto isAtLevel = [&](double y) {
+        return atOrBelowLevel ? (y <= levelThr) : (y >= levelThr);
+    };
+    auto isLeaving = [&](double y) {
+        return atOrBelowLevel ? (y > levelThr) : (y < levelThr);
+    };
+
+    int lastAt = -1;
+    int stable = 0;
+
+    for (int i = qMax(0, startIdx); i < pts.size(); ++i) {
+        const double y = pts[i].y();
+
+        if (isAtLevel(y)) {
+            lastAt = i;
+            stable = qMin(stable + 1, minStable);
+            continue;
+        }
+
+        if (lastAt != -1 && stable >= minStable && isLeaving(y)) {
+            return lastAt;
+        }
+
+        // шум/дрожание: сбрасываем устойчивость, но lastAt оставляем
+        stable = 0;
+    }
+
+    return lastAt; // если так и не "вышли", берём последний найденный
+}
+
+static int findFirstReachLevel(const QVector<QPointF>& pts,
+                               int startIdx,
+                               double levelThr,
+                               bool reachAtOrBelow)
+{
+    // Ищем первую точку достижения целевого уровня.
+    auto reached = [&](double y) {
+        return reachAtOrBelow ? (y <= levelThr) : (y >= levelThr);
+    };
+
+    for (int i = qMax(0, startIdx); i < pts.size(); ++i) {
+        if (reached(pts[i].y()))
+            return i;
+    }
+    return -1;
+}
+
+static quint64 dtMs(const QVector<QPointF>& pts, int a, int b)
+{
+    if (a < 0 || b < 0 || b <= a) return 0;
+    return static_cast<quint64>(pts[b].x() - pts[a].x());
+}
+
+// ======================================================================
+
 StrokeTest::StrokeTest(QObject *parent)
     : Test(parent)
 {}
@@ -69,9 +133,6 @@ void StrokeTest::Process()
     setDacBlocked(0, 0, true, true);
     m_graphTimer->stop();
 
-    // ==========================================================
-    // Получаем точки графика
-    // ==========================================================
     QVector<QVector<QPointF>> allPoints;
     emit GetPoints(allPoints);
 
@@ -84,9 +145,6 @@ void StrokeTest::Process()
 
     const auto& points = allPoints[0];
 
-    // ==========================================================
-    // Поиск min / max
-    // ==========================================================
     double minY = points[0].y();
     double maxY = points[0].y();
 
@@ -95,117 +153,62 @@ void StrokeTest::Process()
         if (p.y() > maxY) maxY = p.y();
     }
 
-    const double zeroThreshold = minY + (maxY - minY) * 0.0050;
-    const double maxThreshold  = maxY - (maxY - minY) * 0.0050;
+    const double lowThr  = minY + (maxY - minY) * 0.0050;
+    const double highThr = maxY - (maxY - minY) * 0.0050;
 
-    // ==========================================================
-    // Поиск характерных точек
-    // ==========================================================
-    int forwardStart = 0;
-    int forwardEnd    = 0;
-    int backwardStart = 0;
-    int backwardEnd   = 0;
+    const bool normalClosed = m_cfg.normalClosed;
 
-    // -------- Прямой ход: последний ноль перед ростом --------
-    bool wasAtZero = false;
-    int lastZeroIndex = -1;
+    const double forwardStartLevel = normalClosed ? lowThr  : highThr;
+    const bool forwardStartIsLow = normalClosed ? true : false;
+    const double forwardEndLevel   = normalClosed ? highThr : lowThr;
+    const bool forwardEndIsLow = normalClosed ? false : true;
 
-    for (int i = 0; i < points.size() - 1; ++i) {
-        if (points[i].y() <= zeroThreshold) {
-            lastZeroIndex = i;
-            wasAtZero = true;
-        } else if (wasAtZero && points[i].y() > zeroThreshold) {
-            forwardStart = lastZeroIndex;
-            break;
-        }
+    const double backwardStartLevel = forwardEndLevel;
+    const bool backwardStartIsLow = forwardEndIsLow;
+
+    const double backwardEndLevel   = forwardStartLevel;
+    const bool backwardEndIsLow   = forwardStartIsLow;
+
+    int forwardStart  = findLastAtLevelBeforeLeaving(points, 0, forwardStartLevel, /*atOrBelowLevel=*/forwardStartIsLow);
+    int forwardEnd = findFirstReachLevel(points, qMax(0, forwardStart), forwardEndLevel, /*reachAtOrBelow=*/forwardEndIsLow);
+
+    int backwardStart = findLastAtLevelBeforeLeaving(points, qMax(0, forwardEnd), backwardStartLevel, /*atOrBelowLevel=*/backwardStartIsLow);
+    int backwardEnd = findFirstReachLevel(points, qMax(0, backwardStart), backwardEndLevel, /*reachAtOrBelow=*/backwardEndIsLow);
+
+    if (forwardStart < 0 || forwardEnd < 0 ||
+        backwardStart < 0 || backwardEnd < 0)
+    {
+        qDebug() << "[StrokeTest] Could not detect full stroke movement";
+        emit Results(0, 0);
+        emit EndTest();
+        return;
     }
 
-    if (forwardStart == 0 && lastZeroIndex != -1) {
-        forwardStart = lastZeroIndex;
-    }
+    quint64 forwardTime  = dtMs(points, forwardStart, forwardEnd);
+    quint64 backwardTime = dtMs(points, backwardStart, backwardEnd);
 
-    // -------- Достижение максимума --------
-    for (int i = forwardStart; i < points.size(); ++i) {
-        if (points[i].y() >= maxThreshold) {
-            forwardEnd = i;
-            break;
-        }
-    }
-
-    // -------- Обратный ход: последний максимум перед спадом --------
-    bool wasAtMax = false;
-    int lastMaxIndex = -1;
-
-    for (int i = forwardEnd; i < points.size() - 1; ++i) {
-        if (points[i].y() >= maxThreshold) {
-            lastMaxIndex = i;
-            wasAtMax = true;
-        } else if (wasAtMax && points[i].y() < maxThreshold) {
-            backwardStart = lastMaxIndex;
-            break;
-        }
-    }
-
-    if (backwardStart == 0 && lastMaxIndex != -1) {
-        backwardStart = lastMaxIndex;
-    }
-
-    // -------- Возврат к нулю --------
-    for (int i = backwardStart; i < points.size(); ++i) {
-        if (points[i].y() <= zeroThreshold) {
-            backwardEnd = i;
-            break;
-        }
-    }
-
-    // ==========================================================
-    // ЧЕЛОВЕЧЕСКИЙ ВЫВОД
-    // ==========================================================
     qDebug().noquote()
         << "\n========== STROKE TEST ANALYSIS ==========\n"
-        << "Total points:" << points.size()
+        << "Mode:" << (normalClosed ? "NormalClosed (low->high->low)" : "NormalOpen (high->low->high)")
+        << "\nTotal points:" << points.size()
         << "\nY range:"
         << "\n  minY =" << minY
         << "\n  maxY =" << maxY
         << "\nThresholds:"
-        << "\n  Zero threshold =" << zeroThreshold
-        << "\n  Max  threshold =" << maxThreshold
+        << "\n  lowThr  =" << lowThr
+        << "\n  highThr =" << highThr
 
         << "\n\n--- FORWARD STROKE ---"
-        << "\nStart (last zero before rise):"
+        << "\nStart:"
         << "\n  " << pointStr(points, forwardStart)
-        << "\nEnd (reach max threshold):"
+        << "\nEnd:"
         << "\n  " << pointStr(points, forwardEnd)
 
         << "\n\n--- BACKWARD STROKE ---"
-        << "\nStart (last max before fall):"
+        << "\nStart:"
         << "\n  " << pointStr(points, backwardStart)
-        << "\nEnd (return to zero):"
+        << "\nEnd:"
         << "\n  " << pointStr(points, backwardEnd);
-
-    // ==========================================================
-    // Время движения
-    // ==========================================================
-    quint64 forwardTime  = 0;
-    quint64 backwardTime = 0;
-
-    if (forwardStart > 0 && forwardEnd > forwardStart) {
-        forwardTime =
-            static_cast<quint64>(points[forwardEnd].x() -
-                                 points[forwardStart].x());
-    }
-
-    if (backwardStart > 0 && backwardEnd > backwardStart) {
-        backwardTime =
-            static_cast<quint64>(points[backwardEnd].x() -
-                                 points[backwardStart].x());
-    }
-
-    qDebug().noquote()
-        << "\n--- RESULT ---"
-        << "\nForward time : " << formatMs(forwardTime)
-        << "\nBackward time: " << formatMs(backwardTime)
-        << "\n=========================================\n";
 
     emit Results(forwardTime, backwardTime);
     emit EndTest();

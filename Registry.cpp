@@ -130,7 +130,7 @@ bool Registry::loadValveInfo(const QString& position)
     m_valveInfo.solenoidValveModel = m_settings.value("solenoidValveModel", "").toString();
     m_valveInfo.limitSwitchModel = m_settings.value("limitSwitchModel", "").toString();
     m_valveInfo.positionSensorModel = m_settings.value("positionSensorModel", "").toString();
-    m_valveInfo.dinamicErrorRecomend = m_settings.value("dinamicErrorRecomend", "").toDouble();
+    m_valveInfo.dinamicErrorRecomend = m_settings.value("dinamicErrorRecomend", "").toString();
     m_valveInfo.strokeMovement = m_settings.value("strokeMovement", "").toInt();
     m_valveInfo.strokValve = m_settings.value("strokValve", "").toString();
     m_valveInfo.driveModel = m_settings.value("driveModel", "").toString();

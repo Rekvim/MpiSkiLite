@@ -204,7 +204,7 @@ bool Mpi::initialize()
 
             sensor->setCoefficients(k, b);
 
-            sensor->setUnit((sensorNum++ == 0) ? "мм" : "bar");
+            sensor->setUnit((sensorNum++ == 0) ? "мм" : "бар");
             m_sensors.push_back(sensor);
         }
     }

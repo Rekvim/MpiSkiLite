@@ -2,14 +2,24 @@
 #include "./Src/Tests/StrokeTest.h"
 #include "./Program.h"
 
-RunnerConfig StrokeTestRunner::buildConfig() {
+RunnerConfig StrokeTestRunner::buildConfig()
+{
     auto* worker = new StrokeTest;
 
-    RunnerConfig cfg;
-    cfg.worker = worker;
-    cfg.totalMs = 0;
-    cfg.chartToClear = static_cast<int>(Charts::Stroke);
-    return cfg;
+    auto owner = qobject_cast<Program*>(parent());
+    const auto& valveInfo = owner->registry()->valveInfo();
+
+    StrokeTest::Config cfg;
+    cfg.normalClosed = (valveInfo.safePosition == 0);
+
+    worker->setConfig(cfg);
+
+    RunnerConfig rc;
+    rc.worker = worker;
+    rc.totalMs = 0;
+    rc.chartToClear = static_cast<int>(Charts::Stroke);
+
+    return rc;
 }
 
 void StrokeTestRunner::wireSpecificSignals(Test& base) {

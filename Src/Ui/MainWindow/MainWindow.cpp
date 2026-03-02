@@ -1,7 +1,7 @@
 #include "MainWindow.h"
 #include "./Src/CustomChart/MyChart.h"
 #include "ui_MainWindow.h"
-
+#include "../Setup/ValveWindow.h"
 #include "Src/ReportBuilders/ReportBuilder.h"
 #include "./Src/Ui/TestSettings/AbstractTestSettings.h"
 
@@ -610,8 +610,7 @@ void MainWindow::applyCrossingLimitsFromRecommend(const ValveInfo& valveInfo)
 
     if (limits.dynamicErrorEnabled) {
         ui->lineEdit_crossingLimits_dynamicError_lowerLimit->setText(QStringLiteral("0"));
-        ui->lineEdit_crossingLimits_dynamicError_upperLimit->setText(
-            QString::number(valveInfo.dinamicErrorRecomend, 'f', 2));
+        ui->lineEdit_crossingLimits_dynamicError_upperLimit->setText(valveInfo.dinamicErrorRecomend);
     }
 }
 
@@ -692,7 +691,7 @@ void MainWindow::updateMainTestUI(const TelemetryStore& t)
             .arg(t.mainTestRecord.dynamicError_meanPercent, 0, 'f', 2)
         );
     ui->label_dynamicErrorMean->setText(
-        QString("%1 mA")
+        QString("%1 мА")
             .arg(t.mainTestRecord.dynamicError_mean, 0, 'f', 3)
         );
     ui->label_dynamicErrorMaxPercent->setText(
@@ -701,7 +700,7 @@ void MainWindow::updateMainTestUI(const TelemetryStore& t)
         );
 
     ui->label_dynamicErrorMax->setText(
-        QString("%1 mA")
+        QString("%1 мА")
             .arg(t.mainTestRecord.dynamicError_max, 0, 'f', 3)
         );
     ui->lineEdit_resultsTable_dynamicErrorReal->setText(
@@ -710,11 +709,11 @@ void MainWindow::updateMainTestUI(const TelemetryStore& t)
         );
 
     ui->label_dynamicErrorMax->setText(
-        QString("%1 bar")
+        QString("%1 бар")
             .arg(t.mainTestRecord.lowLimitPressure, 0, 'f', 2)
         );
     ui->label_dynamicErrorMax->setText(
-        QString("%1 bar")
+        QString("%1 бар")
             .arg(t.mainTestRecord.highLimitPressure, 0, 'f', 2)
         );
 
@@ -892,7 +891,7 @@ void MainWindow::setRegistry(Registry *registry)
     ui->lineEdit_positionerModel->setText(valveInfo.positionerModel);
     ui->lineEdit_strokeMovement->setText(otherParameters.strokeMovement);
     ui->lineEdit_safePosition->setText(otherParameters.safePosition);
-    ui->lineEdit_resultsTable_dynamicErrorRecomend->setText(QString::number(valveInfo.dinamicErrorRecomend, 'f', 2));
+    ui->lineEdit_resultsTable_dynamicErrorRecomend->setText(valveInfo.dinamicErrorRecomend);
     ui->lineEdit_materialStuffingBoxSeal->setText(valveInfo.materialStuffingBoxSeal);
 
     ui->lineEdit_materialStuffingBoxSeal->setText(materialInfo.stuffingBoxSeal);
@@ -946,7 +945,7 @@ void MainWindow::setRegistry(Registry *registry)
 
     if (limits.dynamicErrorEnabled) {
         ui->lineEdit_crossingLimits_dynamicError_lowerLimit->setText(QStringLiteral("0"));
-        ui->lineEdit_crossingLimits_dynamicError_upperLimit->setText(QString::number(valveInfo.dinamicErrorRecomend, 'f', 2));
+        ui->lineEdit_crossingLimits_dynamicError_upperLimit->setText(valveInfo.dinamicErrorRecomend);
     }
 
     for (AbstractTestSettings* s : m_testSettings)
@@ -1402,13 +1401,13 @@ void MainWindow::initCharts()
     bool isRotaryStroke = (valveInfo.strokeMovement != 0);
 
     const QString strokeAxisFormat =
-        isRotaryStroke ? QStringLiteral("%.2f deg")
-                       : QStringLiteral("%.2f mm");
+        isRotaryStroke ? QStringLiteral("%.2f град")
+                       : QStringLiteral("%.2f мм");
 
     m_charts[Charts::Task] = ui->Chart_task;
     m_charts[Charts::Task]->setName(QStringLiteral("Task"));
     m_charts[Charts::Task]->useTimeaxis(false);
-    m_charts[Charts::Task]->addAxis(QStringLiteral("%.2f bar"));
+    m_charts[Charts::Task]->addAxis(QStringLiteral("%.2f бар"));
     m_charts[Charts::Task]->addAxis(strokeAxisFormat);
     m_charts[Charts::Task]->addSeries(1, tr("Задание"), QColor::fromRgb(0, 0, 0));
     m_charts[Charts::Task]->addSeries(1, tr("Датчик линейных перемещений"), QColor::fromRgb(255, 0, 0));
@@ -1425,7 +1424,7 @@ void MainWindow::initCharts()
     m_charts[Charts::Pressure] = ui->Chart_pressure;
     m_charts[Charts::Pressure]->setName(QStringLiteral("Pressure"));
     m_charts[Charts::Pressure]->useTimeaxis(false);
-    m_charts[Charts::Pressure]->setLabelXformat(QStringLiteral("%.2f bar"));
+    m_charts[Charts::Pressure]->setLabelXformat(QStringLiteral("%.2f бар"));
     m_charts[Charts::Pressure]->addAxis(strokeAxisFormat);
     m_charts[Charts::Pressure]->addSeries(0, tr("Перемещение от давления"), QColor::fromRgb(255, 0, 0));
     m_charts[Charts::Pressure]->addSeries(0, tr("Линейная регрессия"), QColor::fromRgb(0, 0, 0));
@@ -1727,20 +1726,128 @@ void MainWindow::restoreSeries(Charts chart, const SeriesVisibilityBackup& b)
     }
 }
 
+void MainWindow::collectReportOverrides()
+{
+    auto readDouble = [this](QLineEdit* le, double& target)
+    {
+        bool ok = false;
+        double v = toDouble(le->text(), &ok);
+        if (ok)
+            target = v;
+    };
+
+    auto readRange = [this](QLineEdit* le, double& low, double& high)
+    {
+        QString s = le->text().trimmed();
+        s.replace(QChar(0x2013), '-');
+        s.replace(QChar(0x2014), '-');
+        s.replace(QChar(0x2212), '-');
+        QStringList parts = s.split('-', Qt::SkipEmptyParts);
+
+        if (parts.size() == 2) {
+            bool ok1 = false;
+            bool ok2 = false;
+            double v1 = toDouble(parts[0], &ok1);
+            double v2 = toDouble(parts[1], &ok2);
+
+            if (ok1 && ok2) {
+                low = v1;
+                high = v2;
+            }
+        }
+    };
+
+    // ===== MainTestRecord =====
+
+    readDouble(ui->lineEdit_resultsTable_frictionForceValue,
+               m_telemetryStore.mainTestRecord.frictionForce);
+
+    readDouble(ui->lineEdit_resultsTable_frictionPercentValue,
+               m_telemetryStore.mainTestRecord.frictionPercent);
+
+    readDouble(ui->lineEdit_resultsTable_dynamicErrorReal,
+               m_telemetryStore.mainTestRecord.dynamicErrorReal);
+
+    readRange(ui->lineEdit_resultsTable_rangePressure,
+              m_telemetryStore.mainTestRecord.lowLimitPressure,
+              m_telemetryStore.mainTestRecord.highLimitPressure);
+
+    readRange(ui->lineEdit_resultsTable_driveRangeReal,
+              m_telemetryStore.mainTestRecord.springLow,
+              m_telemetryStore.mainTestRecord.springHigh);
+
+    // ===== Stroke =====
+
+    readDouble(ui->lineEdit_resultsTable_strokeReal,
+               m_telemetryStore.valveStrokeRecord.real);
+
+    // ===== Stroke test =====
+
+    m_telemetryStore.strokeTestRecord.timeForwardMs =
+        ui->lineEdit_resultsTable_strokeTest_forwardTime->text();
+
+    m_telemetryStore.strokeTestRecord.timeBackwardMs =
+        ui->lineEdit_resultsTable_strokeTest_backwardTime->text();
+}
+
+void MainWindow::collectRegistryOverrides(
+    ObjectInfo& objectInfo,
+    ValveInfo& valveInfo,
+    OtherParameters& otherParameters,
+    MaterialsOfComponentParts& materials)
+{
+    auto readRange = [this](QLineEdit* le, double& low, double& high)
+    {
+        QString s = le->text().trimmed();
+        s.replace(QChar(0x2013), '-');
+        s.replace(QChar(0x2014), '-');
+        s.replace(QChar(0x2212), '-');
+        QStringList parts = s.split('-', Qt::SkipEmptyParts);
+
+        if (parts.size() == 2) {
+            bool ok1 = false;
+            bool ok2 = false;
+            double v1 = toDouble(parts[0], &ok1);
+            double v2 = toDouble(parts[1], &ok2);
+
+            if (ok1 && ok2) {
+                low = v1;
+                high = v2;
+            }
+        }
+    };
+
+    readRange(ui->lineEdit_resultsTable_driveRangeRecomend,
+              valveInfo.driveRangeLow,
+              valveInfo.driveRangeHigh);
+
+    valveInfo.dinamicErrorRecomend = ui->lineEdit_resultsTable_dynamicErrorRecomend->text();
+    valveInfo.strokValve = ui->lineEdit_resultsTable_strokeRecomend->text();
+}
+
 void MainWindow::on_pushButton_report_generate_clicked()
 {
-    std::unique_ptr<ReportBuilder> reportBuilder;
+    collectReportOverrides();
 
-    reportBuilder = std::make_unique<ReportBuilder>();
+    ObjectInfo objectInfo = m_registry->objectInfo();
+    ValveInfo valveInfo = m_registry->valveInfo();
+    OtherParameters otherParameters = m_registry->otherParameters();
+    MaterialsOfComponentParts materials = m_registry->materialsOfComponentParts();
+
+    collectRegistryOverrides(objectInfo, valveInfo, otherParameters, materials);
+
+    std::unique_ptr<ReportBuilder> reportBuilder =
+        std::make_unique<ReportBuilder>();
 
     ReportSaver::Report report;
+
     reportBuilder->buildReport(
         report,
         m_telemetryStore,
-        m_registry->objectInfo(),
-        m_registry->valveInfo(),
-        m_registry->otherParameters(),
-        m_registry->materialsOfComponentParts(),
+        objectInfo,
+        valveInfo,
+        otherParameters,
+        materials,
         m_imageChartTask,
         m_imageChartPressure,
         m_imageChartFriction,
@@ -1757,3 +1864,29 @@ void MainWindow::on_pushButton_report_open_clicked()
     QDesktopServices::openUrl(
         QUrl::fromLocalFile(m_reportSaver->directory().filePath(QStringLiteral("report.xlsx"))));
 }
+
+void MainWindow::on_pushButton_back_clicked()
+{
+    if (m_testState == TestState::Running ||
+        m_testState == TestState::Starting)
+    {
+        QMessageBox::warning(this,
+                             tr("Внимание"),
+                             tr("Нельзя вернуться во время выполнения теста"));
+        return;
+    }
+
+    this->hide();
+
+    ValveWindow valveWindow(this);
+    valveWindow.setRegistry(m_registry);
+    valveWindow.setPatternType(m_patternType);
+
+    if (valveWindow.exec() == QDialog::Accepted) {
+
+        setRegistry(m_registry);
+    }
+
+    this->show();
+}
+

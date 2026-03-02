@@ -137,6 +137,8 @@ private slots:
     void on_pushButton_signal_16mA_clicked();
     void on_pushButton_signal_20mA_clicked();
 
+    void on_pushButton_back_clicked();
+
 private:
     Ui::MainWindow *ui;
     TelemetryStore m_telemetryStore;
@@ -147,6 +149,12 @@ private:
     void setTestState(TestState state);
     TestState m_testState = TestState::Idle;
 
+    void collectRegistryOverrides(
+        ObjectInfo& objectInfo,
+        ValveInfo& valveInfo,
+        OtherParameters& otherParameters,
+        MaterialsOfComponentParts& materials);
+    void collectReportOverrides();
     void lockTabsForPreInit();
     void updateAvailableTabs();
     void applyCrossingLimitsFromRecommend(const ValveInfo& valveInfo);

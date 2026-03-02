@@ -27,12 +27,10 @@ std::optional<QPair<double,double>> parseRange2(QString s)
 {
     s = s.trimmed();
 
-    // нормализуем все тире
     s.replace(QChar(0x2013), '-');
     s.replace(QChar(0x2014), '-');
     s.replace(QChar(0x2212), '-');
 
-    // разделяем по тире
     const QStringList parts = s.split('-', Qt::SkipEmptyParts);
     if (parts.size() != 2)
         return std::nullopt;
@@ -44,7 +42,7 @@ std::optional<QPair<double,double>> parseRange2(QString s)
     if (!ok1 || !ok2)
         return std::nullopt;
 
-    const double low  = qMin(a, b);
+    const double low = qMin(a, b);
     const double high = qMax(a, b);
 
     return QPair<double,double>(low, high);
@@ -187,6 +185,13 @@ void ValveWindow::onPositionerTypeChanged(quint8 index)
         ui->comboBox_dinamicError->addItem(QStringLiteral("2.5"));
         ui->comboBox_dinamicError->setCurrentIndex(0);
     }
+    else if (selected == tr("i/p преобразователь")) {
+        ui->comboBox_dinamicError->addItem(QStringLiteral("Без позиционера"));
+        ui->comboBox_dinamicError->setCurrentIndex(0);
+
+        ui->checkBox_crossingLimits_coefficientFriction->setEnabled(false);
+        ui->checkBox_crossingLimits_coefficientFriction->setChecked(false);
+    }
 }
 
 void ValveWindow::setRegistry(Registry *registry)
@@ -220,9 +225,6 @@ void ValveWindow::applyFrictionLimitsFromStuffingBoxSeal()
 {
     const QString seal = ui->comboBox_materialStuffingBoxSeal->currentText().trimmed();
 
-    // Маппинг: материал -> диапазон (%)
-    // Если строки в комбобоксе отличаются (например "PTFE (тефлон)"),
-    // замени сравнение на contains(...) или приведи варианты.
     double lo = 0.0;
     double hi = 0.0;
     bool known = true;
@@ -238,7 +240,7 @@ void ValveWindow::applyFrictionLimitsFromStuffingBoxSeal()
     }
 
     if (!known)
-        return; // ничего не трогаем, если неизвестное значение
+        return;
 
     ui->lineEdit_crossingLimits_coefficientFriction_lowerLimit
         ->setText(QString::number(lo, 'f', 2));
@@ -334,7 +336,7 @@ void ValveWindow::readFromUi(ValveInfo& v)
                                       ? ui->comboBox_positionerType->currentText()
                                       : "";
 
-    v.dinamicErrorRecomend = ui->comboBox_dinamicError->currentText().toDouble();
+    v.dinamicErrorRecomend = ui->comboBox_dinamicError->currentText();
 
     v.solenoidValveModel = ui->lineEdit_solenoidValveModel->text();
     v.limitSwitchModel = ui->lineEdit_limitSwitchModel->text();
@@ -410,7 +412,6 @@ void ValveWindow::loadToUi(const ValveInfo& v)
         ui->lineEdit_manufacturer->setEnabled(true);
         ui->lineEdit_manufacturer->setText(v.manufacturer);
     }
-
 
     ui->lineEdit_valveModel->setText(v.valveModel);
     ui->lineEdit_serialNumber->setText(v.serialNumber);

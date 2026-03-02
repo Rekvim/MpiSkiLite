@@ -37,9 +37,13 @@ void TechnicalResultsBlock::build(ReportWriter& w,
     const quint16 r5 = r0 + 10; // friction force
 
     // dynamic error
-    w.cell(m_layout.sheet, r0, m_layout.colFact, f2(t.mainTestRecord.dynamicErrorReal));
-    w.cell(m_layout.sheet, r0, m_layout.colNorm, f2(v.dinamicErrorRecomend));
-    w.cell(m_layout.sheet, r0, m_layout.colResult, resultOk(t.crossingStatus.dynamicError));
+    if (v.dinamicErrorRecomend == "Без позиционера") {
+        w.cell(m_layout.sheet, r0, m_layout.colResult, v.dinamicErrorRecomend);
+    } else {
+        w.cell(m_layout.sheet, r0, m_layout.colFact, f2(t.mainTestRecord.dynamicErrorReal));
+        w.cell(m_layout.sheet, r0, m_layout.colNorm, v.dinamicErrorRecomend);
+        w.cell(m_layout.sheet, r0, m_layout.colResult, resultOk(t.crossingStatus.dynamicError));
+    }
 
     // stroke
     w.cell(m_layout.sheet, r1, m_layout.colFact, f2(t.valveStrokeRecord.real));

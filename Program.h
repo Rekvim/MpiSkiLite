@@ -89,8 +89,8 @@ public:
     explicit Program(QObject *parent = nullptr);
     void setRegistry(Registry *registry);
     bool isInitialized() const;
-    // quint8 getDIStatus() { return m_mpi.digitalInputs(); }
-    // quint8 getDOStatus() { return m_mpi.digitalOutputs(); }
+
+    const Registry* registry() const { return m_registry; }
 
 signals:
     void realtimeUpdated(const RealtimeState& s);
