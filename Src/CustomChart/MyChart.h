@@ -9,6 +9,33 @@
 class MyChart : public QChartView
 {
     Q_OBJECT
+
+public:
+    MyChart(QWidget *parent = nullptr);
+    ~MyChart()  = default;
+
+    QString getname() const;
+    void setName(QString name);
+    void setMaxRange(qreal value);
+    QPair<QList<QPointF>, QList<QPointF>> getPoints(quint8 seriesN) const;
+    void saveToStream(QDataStream &stream) const;
+    void loadFromStream(QDataStream &dataStream);
+    void setPointsVisible(quint8 seriesN, bool visible);
+    QVector<MySeries*>& series();
+    void setSeriesMarkersOnly(quint8 seriesN, bool on);
+
+public slots:
+    void useTimeaxis(bool);
+    void addAxis(QString);
+    void addSeries(quint8 axisN, QString name, QColor color);
+    void addPoint(quint8 seriesN, qreal X, qreal Y);
+    void duplicateChartSeries(quint8 seriesN);
+    void clear();
+    void visible(quint8 seriesN, bool visible);
+    void showDots(bool show);
+    void setLabelXformat(QString);
+    void autoUpdate(bool);
+
 private:
     QTimer m_axisTimer;
     QElapsedTimer m_markerTimer;
@@ -16,8 +43,8 @@ private:
     bool m_axesDirty = false;
     bool m_pendingPointAdded = false;
 
-    void updateAxes();               // new
-    bool allowMarkerUpdate();  // new
+    void updateAxes();
+    bool allowMarkerUpdate();
 
     QString m_name;
     const qreal m_minR = 0.1;
@@ -63,32 +90,6 @@ private:
     void zoomOut();
 
     void autoScale(qreal min, qreal max);
-
-public:
-    MyChart(QWidget *parent = nullptr);
-
-    ~MyChart();
-    QString getname() const;
-    void setName(QString name);
-    void setMaxRange(qreal value);
-    QPair<QList<QPointF>, QList<QPointF>> getPoints(quint8 seriesN) const;
-    void saveToStream(QDataStream &stream) const;
-    void loadFromStream(QDataStream &dataStream);
-    void setPointsVisible(quint8 seriesN, bool visible);
-    QVector<MySeries*>& series();
-    void setSeriesMarkersOnly(quint8 seriesN, bool on);
-
-public slots:
-    void useTimeaxis(bool);
-    void addAxis(QString);
-    void addSeries(quint8 axisN, QString name, QColor color);
-    void addPoint(quint8 seriesN, qreal X, qreal Y);
-    void duplicateChartSeries(quint8 seriesN);
-    void clear();
-    void visible(quint8 seriesN, bool visible);
-    void showDots(bool show);
-    void setLabelXformat(QString);
-    void autoUpdate(bool);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

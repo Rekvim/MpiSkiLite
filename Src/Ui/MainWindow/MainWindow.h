@@ -142,10 +142,9 @@ private:
     TelemetryStore m_telemetryStore;
 
     QPlainTextEdit* m_logOutput = nullptr;
-    void setTestState(TestState state);
-
     bool m_isInitialized = false;
 
+    void setTestState(TestState state);
     TestState m_testState = TestState::Idle;
 
     void lockTabsForPreInit();

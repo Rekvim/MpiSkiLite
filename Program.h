@@ -164,6 +164,7 @@ private:
         });
         connect(r.get(), &AbstractTestRunner::testActuallyStarted,
                 this, &Program::testActuallyStarted);
+
         connect(r.get(), &AbstractTestRunner::requestSetDAC,
                 this, &Program::setDacRaw);
 

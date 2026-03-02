@@ -20,7 +20,6 @@ RunnerConfig OptionResponseRunner::buildConfig()
 
     for (auto it = p.points.begin(); it != p.points.end(); ++it)
     {
-        // Базовая точка (инверсия только здесь!)
         const qreal basePercent = normalOpen ? (100.0 - *it) : *it;
         const qreal baseCurrent = 16.0 * basePercent / 100.0 + 4.0;
 
@@ -30,8 +29,6 @@ RunnerConfig OptionResponseRunner::buildConfig()
 
             task.value.push_back(m_mpi.dac()->rawFromValue(current));
 
-            // В терминах тока:
-            // 1-я фаза: вверх, 2-я фаза: вниз (НЕ зависит от normalOpen)
             const qreal dir = (phase == 0 ? +1.0 : -1.0);
 
             for (auto it_s = p.steps.begin(); it_s < p.steps.end(); ++it_s)

@@ -16,46 +16,31 @@ RunnerConfig OptionResolutionRunner::buildConfig()
 
     const bool normalOpen = (m_reg.valveInfo().safePosition != 0);
 
-    // Старт — 4 мА
     task.value.push_back(m_mpi.dac()->rawFromValue(4.0));
 
     for (auto it = p.points.begin(); it != p.points.end(); ++it)
     {
-        // Базовая точка (инверсия только здесь)
-        const qreal basePercent =
-            normalOpen ? (100.0 - *it) : *it;
+        const qreal basePercent = normalOpen ? (100.0 - *it) : *it;
 
-        const qreal baseCurrent =
-            16.0 * basePercent / 100.0 + 4.0;
+        const qreal baseCurrent = 16.0 * basePercent / 100.0 + 4.0;
 
-        const qreal baseRaw =
-            m_mpi.dac()->rawFromValue(baseCurrent);
+        const qreal baseRaw = m_mpi.dac()->rawFromValue(baseCurrent);
 
-        // Добавляем базовую точку
         task.value.push_back(baseRaw);
 
         for (auto it_s = p.steps.begin();
              it_s < p.steps.end();
              ++it_s)
         {
-            const qreal stepValue =
-                16.0 * (*it_s) / 100.0;
+            const qreal stepValue = 16.0 * (*it_s) / 100.0;
+            const qreal stepCurrent = baseCurrent + stepValue;
 
-            // Физически:
-            // NC: сначала вверх (ток +), потом база
-            // NO: сначала вниз (ток +, потому что инверсия уже в базе)
-            const qreal stepCurrent =
-                baseCurrent + stepValue;
+            task.value.push_back(m_mpi.dac()->rawFromValue(stepCurrent));
 
-            task.value.push_back(
-                m_mpi.dac()->rawFromValue(stepCurrent));
-
-            // возврат к базе
             task.value.push_back(baseRaw);
         }
     }
 
-    // Финиш — 4 мА
     task.value.push_back(m_mpi.dac()->rawFromValue(4.0));
 
     worker->SetTask(task);
@@ -64,7 +49,6 @@ RunnerConfig OptionResolutionRunner::buildConfig()
     const quint64 S = static_cast<quint64>(p.steps.size());
     const quint64 delay = static_cast<quint64>(p.delay);
 
-    // старт + для каждой точки: база + (шаг+база)*S + финиш
     const quint64 N_values =
         2ULL + P * (1ULL + 2ULL * S);
 

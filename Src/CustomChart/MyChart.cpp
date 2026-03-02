@@ -58,18 +58,15 @@ MyChart::MyChart(QWidget *parent)
     QOpenGLWidget *glWidget = this->findChild<QOpenGLWidget *>();
     glWidget->setAttribute(Qt::WA_TransparentForMouseEvents);
 
-    m_axisTimer.setInterval(100); // 10 Hz, можно 50..200
+    m_axisTimer.setInterval(100);
     connect(&m_axisTimer, &QTimer::timeout, this, &MyChart::updateAxes);
     m_axisTimer.start();
 
-    m_markerTimer.start(); // для троттлинга маркеров
+    m_markerTimer.start();
 }
-
-MyChart::~MyChart() {}
 
 bool MyChart::allowMarkerUpdate()
 {
-    // ограничим до ~60 fps
     if (!m_markerTimer.isValid()) {
         m_markerTimer.start();
         return true;
