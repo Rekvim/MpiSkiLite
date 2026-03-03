@@ -53,7 +53,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab_manual">
        <attribute name="title">
@@ -3509,7 +3509,7 @@ Border-radius: 10px;
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget_reportGeneration">
           <property name="currentIndex">
-           <number>1</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="tab_info">
            <attribute name="title">

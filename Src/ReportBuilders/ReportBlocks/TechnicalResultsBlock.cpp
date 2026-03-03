@@ -51,13 +51,18 @@ void TechnicalResultsBlock::build(ReportWriter& w,
     w.cell(m_layout.sheet, r1, m_layout.colResult, resultOk(t.crossingStatus.range));
 
     // spring
-    w.cell(m_layout.sheet, r2, m_layout.colFact,
-           QString("%1–%2").arg(f2(t.mainTestRecord.springLow),
-                                f2(t.mainTestRecord.springHigh)));
-    w.cell(m_layout.sheet, r2, m_layout.colNorm,
-           QString("%1–%2").arg(f2(v.driveRangeLow),
-                                f2(v.driveRangeHigh)));
-    w.cell(m_layout.sheet, r2, m_layout.colResult, resultOk(t.crossingStatus.spring));
+    const bool driveDD2 = (v.driveType == 2);
+    if (driveDD2) {
+        w.cell(m_layout.sheet, r2, m_layout.colResult, "Привод ДД");
+    } else {
+        w.cell(m_layout.sheet, r2, m_layout.colFact,
+               QString("%1–%2").arg(f2(t.mainTestRecord.springLow),
+                                    f2(t.mainTestRecord.springHigh)));
+        w.cell(m_layout.sheet, r2, m_layout.colNorm,
+               QString("%1–%2").arg(f2(v.driveRangeLow),
+                                    f2(v.driveRangeHigh)));
+        w.cell(m_layout.sheet, r2, m_layout.colResult, resultOk(t.crossingStatus.spring));
+    }
 
     // pressure limits
     w.cell(m_layout.sheet, r3, m_layout.colFact,

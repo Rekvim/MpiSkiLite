@@ -39,6 +39,9 @@ public slots:
 private:
     QTimer m_axisTimer;
     QElapsedTimer m_markerTimer;
+    QString m_xMarkerFormat = QStringLiteral("%1");
+    QList<QString> m_yMarkerFormats;
+
 
     bool m_axesDirty = false;
     bool m_pendingPointAdded = false;

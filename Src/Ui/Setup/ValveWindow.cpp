@@ -130,6 +130,12 @@ ValveWindow::ValveWindow(QWidget *parent)
                 applyFrictionLimitsFromStuffingBoxSeal();
             });
 
+    connect(ui->comboBox_driveType, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &ValveWindow::onDriveTypeChanged);
+
+    // чтобы сразу выставлялось при открытии
+    onDriveTypeChanged(ui->comboBox_driveType->currentIndex());
+
     // Чтобы сразу выставить по текущему значению при открытии окна:
     applyFrictionLimitsFromStuffingBoxSeal();
 
@@ -143,6 +149,24 @@ void ValveWindow::setPatternType(SelectTests::PatternType pattern)
 {
     m_patternType = pattern;
     applyPatternVisibility();
+}
+
+bool ValveWindow::isDriveDD() const
+{
+    return ui->comboBox_driveType->currentText().trimmed()
+    == tr("Поршневой двойного действия");
+}
+
+void ValveWindow::onDriveTypeChanged(int)
+{
+    if (isDriveDD()) {
+        ui->lineEdit_driveRange->setEnabled(false);
+        ui->lineEdit_driveRange->setText(tr("Привод ДД"));
+    } else {
+        if (ui->lineEdit_driveRange->text().trimmed() == tr("Привод ДД"))
+            ui->lineEdit_driveRange->clear();
+        ui->lineEdit_driveRange->setEnabled(true);
+    }
 }
 
 void ValveWindow::applyPatternVisibility()
@@ -189,8 +213,8 @@ void ValveWindow::onPositionerTypeChanged(quint8 index)
         ui->comboBox_dinamicError->addItem(QStringLiteral("Без позиционера"));
         ui->comboBox_dinamicError->setCurrentIndex(0);
 
-        ui->checkBox_crossingLimits_coefficientFriction->setEnabled(false);
-        ui->checkBox_crossingLimits_coefficientFriction->setChecked(false);
+        ui->checkBox_crossingLimits_dinamicError->setEnabled(false);
+        ui->checkBox_crossingLimits_dinamicError->setChecked(false);
     }
 }
 
@@ -348,10 +372,17 @@ void ValveWindow::readFromUi(ValveInfo& v)
     v.safePosition = ui->comboBox_safePosition->currentIndex();
     v.driveType = ui->comboBox_driveType->currentIndex();
 
-    auto r = parseRange2(ui->lineEdit_driveRange->text());
-    if (r) {
-        v.driveRangeLow = r->first;
-        v.driveRangeHigh = r->second;
+    const QString driveRangeText = ui->lineEdit_driveRange->text().trimmed();
+
+    if (isDriveDD() || driveRangeText == tr("Привод ДД")) {
+        v.driveRangeLow = 0.0;
+        v.driveRangeHigh = 0.0;
+    } else {
+        auto r = parseRange2(driveRangeText);
+        if (r) {
+            v.driveRangeLow = r->first;
+            v.driveRangeHigh = r->second;
+        }
     }
 
     v.driveDiameter = ui->lineEdit_driveDiameter->text().toDouble();

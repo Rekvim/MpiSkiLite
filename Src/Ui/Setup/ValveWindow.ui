@@ -36,7 +36,7 @@
       <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_data">
       <property name="sizePolicy">
@@ -1556,7 +1556,12 @@
             </item>
             <item>
              <property name="text">
-              <string>Поршневой</string>
+              <string>Поршневой одностороннего</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Поршневой двойного действия</string>
              </property>
             </item>
            </widget>

@@ -39,6 +39,9 @@ private:
     void readMaterialsFromUi(MaterialsOfComponentParts& m);
     void loadMaterialsToUi(const MaterialsOfComponentParts& m);
 
+    void onDriveTypeChanged(int index);
+    bool isDriveDD() const;
+
     void readFromUi(ValveInfo& v);
     void loadToUi(const ValveInfo& v);
 

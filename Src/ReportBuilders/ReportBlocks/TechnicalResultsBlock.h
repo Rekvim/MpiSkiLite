@@ -10,7 +10,7 @@ public:
         quint16 rowStart; // 22
         quint16 colFact; // 5
         quint16 colNorm; // 8
-        quint16 colResult; // 11
+        quint16 colResult; // 114
         quint16 rowStrokeTime; // 48
     };
 
