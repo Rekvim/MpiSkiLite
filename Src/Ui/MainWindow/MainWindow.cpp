@@ -805,6 +805,7 @@ void MainWindow::setTaskControlsEnabled(bool enabled)
     ui->doubleSpinBox_task->setEnabled(enabled);
     ui->groupBox_DO->setEnabled(enabled);
     ui->groupBox_SettingCurrentSignal->setEnabled(enabled);
+    ui->pushButton_back->setEnabled(enabled);
 }
 
 void MainWindow::triggerPrimaryAction()
