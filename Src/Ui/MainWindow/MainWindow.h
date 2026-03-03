@@ -145,6 +145,7 @@ private:
 
     QPlainTextEdit* m_logOutput = nullptr;
     bool m_isInitialized = false;
+    bool m_chartsInitialized = false;
 
     void setTestState(TestState state);
     TestState m_testState = TestState::Idle;
@@ -155,6 +156,7 @@ private:
         OtherParameters& otherParameters,
         MaterialsOfComponentParts& materials);
     void collectReportOverrides();
+
     void lockTabsForPreInit();
     void updateAvailableTabs();
     void applyCrossingLimitsFromRecommend(const ValveInfo& valveInfo);

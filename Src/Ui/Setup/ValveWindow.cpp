@@ -133,10 +133,8 @@ ValveWindow::ValveWindow(QWidget *parent)
     connect(ui->comboBox_driveType, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &ValveWindow::onDriveTypeChanged);
 
-    // чтобы сразу выставлялось при открытии
     onDriveTypeChanged(ui->comboBox_driveType->currentIndex());
 
-    // Чтобы сразу выставить по текущему значению при открытии окна:
     applyFrictionLimitsFromStuffingBoxSeal();
 
     onPositionerTypeChanged(ui->comboBox_positionerType->currentIndex());
@@ -204,10 +202,12 @@ void ValveWindow::onPositionerTypeChanged(quint8 index)
     if (selected == tr("Интеллектуальный ЭПП")) {
         ui->comboBox_dinamicError->addItem(QStringLiteral("1.5"));
         ui->comboBox_dinamicError->setCurrentIndex(0);
+        ui->checkBox_crossingLimits_dinamicError->setEnabled(true);
     }
     else if (selected == tr("ЭПП") || selected == tr("ПП")) {
         ui->comboBox_dinamicError->addItem(QStringLiteral("2.5"));
         ui->comboBox_dinamicError->setCurrentIndex(0);
+        ui->checkBox_crossingLimits_dinamicError->setEnabled(true);
     }
     else if (selected == tr("i/p преобразователь")) {
         ui->comboBox_dinamicError->addItem(QStringLiteral("Без позиционера"));

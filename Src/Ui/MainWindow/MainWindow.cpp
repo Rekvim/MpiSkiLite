@@ -572,20 +572,15 @@ void MainWindow::applyCrossingLimitsFromRecommend(const ValveInfo& valveInfo)
     }
 
     if (limits.springEnabled) {
-
-        // Берём значения из чисел (как ты и хотел)
         double low = valveInfo.driveRangeLow;
         double high = valveInfo.driveRangeHigh;
 
-        // Если по смыслу эти величины не могут быть отрицательными —
-        // нормализуем (иначе получишь -1.28 и т.п.)
         low = std::abs(low);
         high = std::abs(high);
 
         if (low > high)
             std::swap(low, high);
 
-        // Допуски ВОКРУГ каждого числа отдельно (как было у тебя)
         const double lowDelta = low * (limits.springLowerLimit / 100.0);
         const double highDelta = high * (limits.springUpperLimit / 100.0);
 
@@ -595,18 +590,15 @@ void MainWindow::applyCrossingLimitsFromRecommend(const ValveInfo& valveInfo)
         double highLo = high - highDelta;
         double highHi = high + highDelta;
 
-        // Запрещаем отрицательные границы (если физически не бывает < 0)
         lowLo = std::max(0.0, lowLo);
         highLo = std::max(0.0, highLo);
 
-        // На всякий случай порядок
         if (lowLo > lowHi) std::swap(lowLo, lowHi);
         if (highLo > highHi) std::swap(highLo, highHi);
 
         ui->lineEdit_crossingLimits_spring_lowerLimit->setText(formatRange(lowLo, lowHi));
         ui->lineEdit_crossingLimits_spring_upperLimit->setText(formatRange(highLo, highHi));
     }
-
 
     if (limits.dynamicErrorEnabled) {
         ui->lineEdit_crossingLimits_dynamicError_lowerLimit->setText(QStringLiteral("0"));
@@ -959,7 +951,10 @@ void MainWindow::setRegistry(Registry *registry)
     for (AbstractTestSettings* s : m_testSettings)
         s->applyValveInfo(valveInfo);
 
-    initCharts();
+    if (!m_chartsInitialized) {
+        initCharts();
+        m_chartsInitialized = true;
+    }
 
     m_program->setRegistry(registry);
     m_programThread->start();
@@ -1222,15 +1217,6 @@ void MainWindow::onResponseTestParametersRequested(OtherTestSettings::TestParame
     }
 }
 
-
-static QString seqToString(const QVector<qreal>& seq)
-{
-    QStringList parts;
-    parts.reserve(seq.size());
-    for (quint16 v : seq) parts << QString::number(v);
-    return parts.join('-');
-}
-
 void MainWindow::askQuestion(const QString &title, const QString &text, bool &result)
 {
     result = (QMessageBox::question(this, title, text) == QMessageBox::Yes);
@@ -1394,7 +1380,6 @@ void MainWindow::syncTaskChartSeriesVisibility(quint8 sensorCount)
     auto *ch = m_charts.value(Charts::Task, nullptr);
     if (!ch) return;
 
-    // 0 - Задание, 1 - линейный датчик, 2..4 - давления 1..3
     ch->visible(0, sensorCount > 1 && ui->checkBox_showCurve_task->isChecked());
     ch->visible(1, sensorCount > 1 && ui->checkBox_showCurve_moving->isChecked());
 
@@ -1785,12 +1770,10 @@ void MainWindow::collectReportOverrides()
               m_telemetryStore.mainTestRecord.springHigh);
 
     // ===== Stroke =====
-
     readDouble(ui->lineEdit_resultsTable_strokeReal,
                m_telemetryStore.valveStrokeRecord.real);
 
     // ===== Stroke test =====
-
     m_telemetryStore.strokeTestRecord.timeForwardMs =
         ui->lineEdit_resultsTable_strokeTest_forwardTime->text();
 

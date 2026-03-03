@@ -1,4 +1,5 @@
 #pragma once
+
 #include <QPointF>
 #include <QTimer>
 #include <QDateTime>
@@ -22,5 +23,5 @@ signals:
     void Results(quint64 forwardTime, quint64 backwardTime);
 
 private:
-    Config m_cfg; // <-- ДОБАВИТЬ
+    Config m_cfg;
 };
