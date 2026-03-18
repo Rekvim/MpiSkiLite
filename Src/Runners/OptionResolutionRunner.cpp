@@ -12,9 +12,9 @@ RunnerConfig OptionResolutionRunner::buildConfig()
 
     auto* worker = new OptionTest;
     OptionTest::Task task;
-    task.delay = p.delay;
-
     const bool normalOpen = (m_reg.valveInfo().safePosition != 0);
+
+    task.delay = p.delay;
 
     task.value.push_back(m_mpi.dac()->rawFromValue(4.0));
 
@@ -33,9 +33,16 @@ RunnerConfig OptionResolutionRunner::buildConfig()
              ++it_s)
         {
             const qreal stepValue = 16.0 * (*it_s) / 100.0;
-            const qreal stepCurrent = baseCurrent + stepValue;
 
-            task.value.push_back(m_mpi.dac()->rawFromValue(stepCurrent));
+            // вверх
+            const qreal stepUpCurrent = baseCurrent + stepValue;
+            task.value.push_back(m_mpi.dac()->rawFromValue(stepUpCurrent));
+
+            task.value.push_back(baseRaw);\
+
+                // вниз
+                const qreal stepDownCurrent = baseCurrent - stepValue;
+            task.value.push_back(m_mpi.dac()->rawFromValue(stepDownCurrent));
 
             task.value.push_back(baseRaw);
         }
@@ -50,7 +57,7 @@ RunnerConfig OptionResolutionRunner::buildConfig()
     const quint64 delay = static_cast<quint64>(p.delay);
 
     const quint64 N_values =
-        2ULL + P * (1ULL + 2ULL * S);
+        2ULL + P * (1ULL + 4ULL * S);
 
     const quint64 totalMs =
         10000ULL + N_values * delay + 10000ULL;

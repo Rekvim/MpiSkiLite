@@ -94,6 +94,7 @@ ValveWindow::ValveWindow(QWidget *parent)
     bindTab(1, ui->tab_data);
     bindTab(2, ui->tab_passFail);
     bindTab(3, ui->tab_materials);
+    bindTab(4, ui->tab);
 
     QValidator *validatorDigits = ValidatorFactory::create(ValidatorFactory::Type::Digits, this);
     QValidator *validatorDigitsDot = ValidatorFactory::create(ValidatorFactory::Type::DigitsDot, this);
@@ -109,9 +110,6 @@ ValveWindow::ValveWindow(QWidget *parent)
     // ui->lineEdit_driveRange->setValidator(validatorDigitsDot);
     ui->lineEdit_driveDiameter->setValidator(validatorDigitsDot);
     ui->lineEdit_pulleyDiameter->setValidator(validatorDigitsDot);
-
-    connect(ui->lineEdit_pulleyDiameter, &QLineEdit::textChanged,
-            this, &ValveWindow::diameterChanged);
 
     connect(ui->comboBox_strokeMovement, &QComboBox::currentIndexChanged,
             this, &ValveWindow::strokeChanged);
@@ -139,8 +137,15 @@ ValveWindow::ValveWindow(QWidget *parent)
 
     onPositionerTypeChanged(ui->comboBox_positionerType->currentIndex());
 
-    ui->lineEdit_pulleyDiameter->setText(m_diameter[0]);
-    diameterChanged(m_diameter[0]);
+    toolChanged(ui->comboBox_toolNumber->currentIndex());
+
+    loadLinearRange();
+
+    ui->lineEdit_linearMin->setValidator(
+        ValidatorFactory::create(ValidatorFactory::Type::DigitsDot, this));
+
+    ui->lineEdit_linearMax->setValidator(
+        ValidatorFactory::create(ValidatorFactory::Type::DigitsDot, this));
 }
 
 void ValveWindow::setPatternType(SelectTests::PatternType pattern)
@@ -462,7 +467,7 @@ void ValveWindow::loadToUi(const ValveInfo& v)
             .arg(v.driveRangeHigh, 0, 'f', 2)
         );
 
-    ui->lineEdit_pulleyDiameter->setText(QString::number(v.diameterPulley));
+    // ui->lineEdit_pulleyDiameter->setText(QString::number(v.diameterPulley));
 
     ui->lineEdit_driveDiameter->setText(QString::number(v.driveDiameter));
 
@@ -586,8 +591,55 @@ void ValveWindow::on_pushButton_netWindow_clicked()
     accept();
 }
 
+void ValveWindow::loadLinearRange()
+{
+    QString path = QCoreApplication::applicationDirPath() + "/settings.ini";
+
+    QSettings settings(path, QSettings::IniFormat);
+
+    double min = settings.value("Sensors/Linear/min", 0).toDouble();
+    double max = settings.value("Sensors/Linear/max", 50).toDouble();
+
+    ui->lineEdit_linearMin->setText(QString::number(min));
+    ui->lineEdit_linearMax->setText(QString::number(max));
+}
+
+void ValveWindow::saveLinearRange()
+{
+    QString path = QCoreApplication::applicationDirPath() + "/settings.ini";
+
+    QSettings settings(path, QSettings::IniFormat);
+
+    settings.setValue(
+        "Sensors/Linear/min",
+        ui->lineEdit_linearMin->text().toDouble());
+
+    settings.setValue(
+        "Sensors/Linear/max",
+        ui->lineEdit_linearMax->text().toDouble());
+}
+
 void ValveWindow::on_pushButton_clear_clicked()
 {
+    saveLinearRange();
+
+    double min = ui->lineEdit_linearMin->text().toDouble();
+    double max = ui->lineEdit_linearMax->text().toDouble();
+
+    if (min >= max) {
+        QMessageBox::warning(this,
+                             tr("Ошибка"),
+                             tr("Минимальное значение должно быть меньше максимального"));
+        return;
+    }
+
+    if (ui->lineEdit_positionNumber->text().isEmpty()) {
+        QMessageBox::warning(this,
+                             tr("Ошибка"),
+                             tr("Введите номер позиции"));
+        return;
+    }
+
     ui->lineEdit_manufacturer->clear();
     ui->lineEdit_valveModel->clear();
     ui->lineEdit_serialNumber->clear();

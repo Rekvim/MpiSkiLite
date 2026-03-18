@@ -1,15 +1,5 @@
 #include "MyChart.h"
 
-namespace {
-static QString extractAxisUnit(const QString& templ)
-{
-    QString unit = templ;
-    unit.replace(QStringLiteral("%1"), QString());
-    unit.replace(QStringLiteral("%%"), QStringLiteral("%"));
-    return unit.trimmed();
-}
-}
-
 MyChart::MyChart(QWidget *parent)
     : QChartView(parent)
 {
@@ -29,17 +19,7 @@ MyChart::MyChart(QWidget *parent)
     m_xaxis = m_xaxisValue;
     m_minRange = m_minR;
 
-    m_xMarkerFormat = QStringLiteral("%1 мА");
-    m_xaxisValue->setLabelFormat("%.2f");
-    m_xaxisValue->setRange(0, m_minR);
-    m_xaxisValue->setMinorTickCount(4);
-
-    QFont xf = m_xaxisValue->titleFont();
-    xf.setBold(false);
-    m_xaxisValue->setTitleFont(xf);
-    m_xaxisValue->setTitleText(QStringLiteral("мА"));
-    m_xaxisValue->setTitleVisible(true);
-
+    m_xaxisValue->setLabelFormat("%.2f mA");
     m_xaxisValue->setRange(0, m_minR);
     m_xaxisValue->setMinorTickCount(4);
 
@@ -69,26 +49,25 @@ MyChart::MyChart(QWidget *parent)
 
     m_coordItem = new QGraphicsSimpleTextItem(this->chart());
 
-    QFont font = this->font();   // берём уже существующий GUI-шрифт
-    chart()->setTitleFont(font);
-    chart()->legend()->setFont(font);
-
-    m_xaxisValue->setLabelsFont(font);
-    m_xaxisTime->setLabelsFont(font);
+    QFont font;
+    font.setPointSize(10);
+    m_coordItem->setFont(font);
     m_coordItem->show();
     m_coordItem->setVisible(false);
 
     QOpenGLWidget *glWidget = this->findChild<QOpenGLWidget *>();
     glWidget->setAttribute(Qt::WA_TransparentForMouseEvents);
 
-    m_axisTimer.setInterval(100);
+    m_axisTimer.setInterval(100); // 10 Hz, можно 50..200
     connect(&m_axisTimer, &QTimer::timeout, this, &MyChart::updateAxes);
     m_axisTimer.start();
-    m_markerTimer.start();
+
+    m_markerTimer.start(); // для троттлинга маркеров
 }
 
 bool MyChart::allowMarkerUpdate()
 {
+    // ограничим до ~60 fps
     if (!m_markerTimer.isValid()) {
         m_markerTimer.start();
         return true;
@@ -147,22 +126,21 @@ void MyChart::drawMarkers(QPoint pos)
 
     QPointF curVal = this->chart()->mapToValue(pos);
 
+    QString format;
     QString coordStr = "";
 
     for (MySeries *mySerial : mySeries) {
-        const int axisN = mySerial->getAxisN();
-        QString format = (axisN < m_yMarkerFormats.size())
-                             ? m_yMarkerFormats.at(axisN)
-                             : QStringLiteral("%1");
-
-        double value = this->chart()->mapToValue(pos, mySerial).y();
-        coordStr += format.arg(value, 0, 'f', 2) + "\n";
+        format = m_yaxis.at(mySerial->getAxisN())->labelFormat();
+        coordStr += QString::asprintf(format.toLocal8Bit(),
+                                      this->chart()->mapToValue(pos, mySerial).y())
+                    + "\n";
     }
 
     if (m_xaxis == m_xaxisValue) {
-        coordStr += m_xMarkerFormat.arg(curVal.x(), 0, 'f', 2);
+        format = m_xaxisValue->labelFormat();
+        coordStr += QString::asprintf(format.toLocal8Bit(), curVal.x());
     } else {
-        const QTime time = QTime::fromMSecsSinceStartOfDay(static_cast<int>(curVal.x()));
+        QTime time = QTime::fromMSecsSinceStartOfDay(curVal.x());
         coordStr += time.toString(m_xaxisTime->format());
     }
 
@@ -197,17 +175,7 @@ void MyChart::drawMarkers(QPoint pos)
 
 void MyChart::setLabelXformat(QString format)
 {
-    m_xMarkerFormat = format;
-    m_xaxisValue->setLabelFormat("%.2f");
-
-    const QString unit = extractAxisUnit(format);
-
-    QFont f = m_xaxisValue->titleFont();
-    f.setBold(false);
-    m_xaxisValue->setTitleFont(f);
-
-    m_xaxisValue->setTitleText(unit);
-    m_xaxisValue->setTitleVisible(!unit.isEmpty());
+    m_xaxisValue->setLabelFormat(format);
 }
 
 void MyChart::autoScale(qreal min, qreal max)
@@ -367,24 +335,15 @@ void MyChart::addAxis(QString format)
     }
 
     m_yaxis.emplace_back(new QValueAxis(this));
-
-    m_yMarkerFormats.push_back(format);
-
-    m_yaxis.last()->setLabelFormat("%.2f");
-
-    const QString unit = extractAxisUnit(format);
-
-    QFont f = m_yaxis.last()->titleFont();
-    f.setBold(false);
-    m_yaxis.last()->setTitleFont(f);
-
-    m_yaxis.last()->setTitleText(unit);
-    m_yaxis.last()->setTitleVisible(!unit.isEmpty());
-
+    m_yaxis.last()->setLabelFormat(format);
     chart()->addAxis(m_yaxis.last(), Qt::AlignLeft);
 
     m_yaxis.last()->setRange(0, 0.01);
     m_yaxis.last()->setMinorTickCount(4);
+
+    //    QFont font = Yaxis.last()->labelsFont();
+    //    font.setPixelSize(13);
+    //    Yaxis.last()->setLabelsFont(font);
 
     m_marker_X.attachAxis(m_yaxis.last());
     m_marker_Y.attachAxis(m_yaxis.last());
@@ -626,12 +585,12 @@ void MyChart::saveToStream(QDataStream &stream) const
 {
     stream << m_name;
     stream << (m_xaxis == m_xaxisValue);
+    stream << m_xaxisValue->labelFormat();
 
-    stream << m_xMarkerFormat;
+    stream << m_yaxis.size();
 
-    stream << m_yMarkerFormats.size();
-    for (const QString& fmt : m_yMarkerFormats) {
-        stream << fmt;
+    for (const QValueAxis *yaxis : m_yaxis) {
+        stream << yaxis->labelFormat();
     }
 
     stream << m_mySeries.size();

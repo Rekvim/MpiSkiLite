@@ -45,6 +45,7 @@ private:
     void readFromUi(ValveInfo& v);
     void loadToUi(const ValveInfo& v);
 
+
     const QString kManualInput = tr("Ручной ввод");
     QList<QString> m_diameter = {QStringLiteral("50.0"), QStringLiteral("86.0"), QStringLiteral("108.0"), QStringLiteral("125.0")};
 
@@ -53,6 +54,8 @@ private:
     void saveValveInfo();
     void applyPatternVisibility();
 
+    void loadLinearRange();
+    void saveLinearRange();
 
 private slots:
     void onPositionerTypeChanged(quint8 index);
