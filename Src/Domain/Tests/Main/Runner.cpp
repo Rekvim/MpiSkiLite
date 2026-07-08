@@ -7,27 +7,26 @@ namespace Domain::Tests::Main {
 
 RunnerConfig Runner::buildConfig()
 {
-    auto p = m_params;
+    auto params = m_params;
 
-    if (p.delay == 0)
+    if (params.delay == 0)
         return {};
 
-    const quint64 N = static_cast<quint64>(p.pointNumbers);
+    const quint64 N = static_cast<quint64>(params.pointNumbers);
 
-    const quint64 upMs = p.delay + N * p.response;
-    const quint64 downMs = p.delay + N * p.response;
+    const quint64 upMs = params.delay + N * params.response;
+    const quint64 downMs = params.delay + N * params.response;
     const quint64 totalMs = 10000ULL + upMs + downMs + 10000ULL;
 
-    p.dac_min =
-        qMax(m_device.dac()->rawFromValue(p.signal_min),
+    params.dac_min =
+        qMax(m_device.dac()->rawFromValue(params.signal_min),
              m_device.dacMin());
 
-    p.dac_max =
-        qMin(m_device.dac()->rawFromValue(p.signal_max),
+    params.dac_max =
+        qMin(m_device.dac()->rawFromValue(params.signal_max),
              m_device.dacMax());
 
-    auto worker = std::make_unique<Algorithm>();
-    worker->setParameters(p);
+    auto worker = std::make_unique<Algorithm>(params);
 
     return makeConfig(
         std::move(worker),

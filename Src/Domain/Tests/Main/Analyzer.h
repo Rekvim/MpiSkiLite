@@ -64,7 +64,8 @@ public:
 
     void startBackwardStroke();
 
-    const QVector<QPointF>& regressionChartPoints() const;
+    const QVector<QPointF>& regressionChartPointsForward() const;
+    const QVector<QPointF>& regressionChartPointsBackward() const;
     const QVector<QPointF>& frictionChartPoints() const;
 
 private:
@@ -79,7 +80,8 @@ private:
     QVector<PressurePoint> m_pressureSeriesFirst;
     QVector<PressurePoint> m_pressureSeriesSecond;
 
-    QVector<QPointF> m_regressionChartPoints;
+    QVector<QPointF> m_regressionChartPointsForward;
+    QVector<QPointF> m_regressionChartPointsBackward;
     QVector<QPointF> m_frictionChartPoints;
 
 private:
@@ -124,11 +126,6 @@ private:
     QPair<double, double> computeSpringLimits(
         const Regression& regressionForward,
         const Regression& regressionBackward,
-        const Limits& limits) const;
-
-    QVector<QPointF> buildRegressionChartPoints(
-        const Regression& regressionFirst,
-        const Regression& regressionSecond,
         const Limits& limits) const;
 
     QVector<QPointF> buildRegressionLinePoints(

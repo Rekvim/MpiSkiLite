@@ -143,7 +143,7 @@ void DeviceInitializer::calculateCoefficients()
 
 void DeviceInitializer::recordStrokeRange()
 {
-    const qreal value = m_device[0]->value();
+    const qreal value = m_device[0]->range();
 
     m_telemetry.valveStrokeRecord.range = QString("%1").arg(value, 0, 'f', 2);
 

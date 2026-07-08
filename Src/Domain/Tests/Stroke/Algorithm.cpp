@@ -3,7 +3,6 @@
 namespace Domain::Tests::Stroke {
     void Algorithm::run()
     {
-        emit executionStarted();
         setDacBlocked(0, 10000, true);
 
         if (m_terminate) {

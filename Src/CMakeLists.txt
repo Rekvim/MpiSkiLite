@@ -50,7 +50,7 @@ set(DOMAIN_HEADERS
     Domain/Measurement/TestDataBuffer.h
     Domain/Mpi/Device.h
     Domain/Mpi/Settings.h
-    Domain/Tests/AnalyzerFactory.h
+
     Domain/Tests/IAnalyzer.h
     Domain/Tests/Main/Algorithm.h
     Domain/Tests/Main/AlgorithmDoubleActing.h
@@ -115,6 +115,7 @@ set(REPORT_CPP
     Report/Blocks/ObjectInfo.cpp
     Report/Blocks/ValveSpec.cpp
     Report/Blocks/TechnicalResults.cpp
+    Report/Blocks/Materials.cpp
     Report/Saver.cpp
     Report/Writer.cpp
 )
@@ -127,6 +128,7 @@ set(REPORT_HEADERS
     Report/Blocks/StepReactionTable.h
     Report/Blocks/TechnicalResults.h
     Report/Blocks/ValveSpec.h
+    Report/Blocks/Materials.h
     Report/Saver.h
     Report/Data.h
     Report/Writer.h
@@ -190,7 +192,6 @@ set(GUI_UI
 add_library(Domain STATIC
     ${DOMAIN_CPP}
     ${DOMAIN_HEADERS}
-    Report/Blocks/Materials.h Report/Blocks/Materials.cpp
 )
 
 target_include_directories(Domain

@@ -9,8 +9,8 @@ class AlgorithmDoubleActing : public Algorithm
     Q_OBJECT
 
 public:
-    explicit AlgorithmDoubleActing(QObject* parent = nullptr)
-        : Algorithm(parent)
+    explicit AlgorithmDoubleActing(Params params, QObject* parent = nullptr)
+        : Algorithm(std::move(params), parent)
     {
     }
 

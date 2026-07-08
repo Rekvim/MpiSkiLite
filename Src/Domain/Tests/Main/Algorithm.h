@@ -3,6 +3,8 @@
 #include "Domain/Tests/AbstractTestAlgorithm.h"
 #include "Params.h"
 
+#include <utility>
+
 namespace Domain::Tests::Main {
 
 class Algorithm : public AbstractTestAlgorithm
@@ -10,24 +12,20 @@ class Algorithm : public AbstractTestAlgorithm
     Q_OBJECT
 
 public:
-    explicit Algorithm(QObject* parent = nullptr)
-        : AbstractTestAlgorithm(parent)
+    explicit Algorithm(Params params, QObject* parent = nullptr)
+        : AbstractTestAlgorithm(parent), m_params(std::move(params))
     {
     }
 
     void run() override;
-    void setParameters(Params& parameters);
 
 protected:
-    Params m_params;
+    const Params m_params;
 
 signals:
     void requestSensorRawValue(quint16& value);
 
-    // Для графиков.
     void dublSeries();
-
-    // Для Analyzer.
     void backwardStrokeStarted();
 
     // Сценарий завершил проход и может считать Analyzer.

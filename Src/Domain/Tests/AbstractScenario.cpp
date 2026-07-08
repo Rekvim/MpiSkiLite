@@ -1,5 +1,4 @@
 #include "AbstractScenario.h"
-#include <qDebug>
 
 namespace Domain::Tests {
 

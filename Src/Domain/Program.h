@@ -127,8 +127,6 @@ signals:
     void totalTestTimeMs(quint64 totalMs);
     void runnerFinished();
 
-    // Emitted when the double-acting + IP-converter algorithm is waiting for
-    // the operator to manually reset mA and press Continue
     void manualResumeRequired();
 
 private:
@@ -204,7 +202,8 @@ public slots:
     void setInitDoStates(const QVector<bool>& states);
     void setPattern(SelectTests::PatternType pattern) { m_patternType = pattern; }
 
-    void addRegression(const QVector<QPointF>& points);
+    void addRegression(const QVector<QPointF>& forwardPoints,
+                       const QVector<QPointF>& backwardPoints);
     void addFriction(const QVector<QPointF>& points);
 
     void setDacReal(qreal value);

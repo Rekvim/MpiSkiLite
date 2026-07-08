@@ -302,6 +302,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onManualResumeRequired,
             Qt::QueuedConnection);
 
+
     connect(ui->pushButton_mainTest_continue, &QPushButton::clicked,
             this, [this] {
                 ui->pushButton_mainTest_continue->setVisible(false);
@@ -311,6 +312,7 @@ MainWindow::MainWindow(QWidget *parent)
                     Qt::QueuedConnection);
             });
 
+    ui->pushButton_mainTest_continue->setVisible(false);
     ui->tabWidget_mainTests->setCurrentIndex(0);
     ui->tabWidget_optionalTests->setCurrentIndex(0);
     ui->tabWidget_reportGeneration->setCurrentIndex(0);
@@ -325,8 +327,8 @@ MainWindow::MainWindow(QWidget *parent)
     // bindImage
     auto bindImage = [this](QPushButton* btn, QLabel* label, ChartType chart)
     {
-        connect(btn, &QPushButton::clicked, this, [this, label, chart]
-                {
+        connect(btn, &QPushButton::clicked,
+                this, [this, label, chart] {
                     getImage(label, chart);
                 });
     };
@@ -352,7 +354,7 @@ MainWindow::MainWindow(QWidget *parent)
                     tr("Основной тест") );
             });
 
-    ui->groupBox_feedback_4_20mA->setVisible(false);
+    // ui->groupBox_feedback_4_20mA->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -433,7 +435,6 @@ void MainWindow::setupUiConnections()
     connect(ui->pushButton_strokeTest_save, &QPushButton::clicked,
             this, &MainWindow::saveStrokeChartClicked);
 
-
     // ===== optional tests =====
     connect(ui->pushButton_optionalTests_start, &QPushButton::clicked,
             this, &MainWindow::startOptionalTestClicked);
@@ -459,10 +460,10 @@ void MainWindow::setupUiConnections()
 
 void MainWindow::lockTabsForPreInit()
 {
-    ui->tabWidget_main->setTabEnabled(ui->tabWidget_main->indexOf(ui->tab_mainTests), false);
-    ui->tabWidget_main->setTabEnabled(1, false);
-    ui->tabWidget_main->setTabEnabled(2, false);
-    ui->tabWidget_main->setTabEnabled(3, false);
+    // ui->tabWidget_main->setTabEnabled(ui->tabWidget_main->indexOf(ui->tab_mainTests), false);
+    // ui->tabWidget_main->setTabEnabled(1, false);
+    // ui->tabWidget_main->setTabEnabled(2, false);
+    // ui->tabWidget_main->setTabEnabled(3, false);
 }
 
 void MainWindow::updateAvailableTabs()
@@ -646,6 +647,9 @@ void MainWindow::onMainResultUpdated(const Domain::Tests::Main::Result& result)
 
     m_mapper->updateMainTest(result, m_telemetry.valveStrokeRecord);
     m_mapper->updateCrossingValues(result, m_telemetry.valveStrokeRecord);
+
+    if (auto* chart = m_chartManager->chart(ChartType::Pressure))
+        chart->snapshotDraggableSeries();
 }
 
 void MainWindow::onStrokeResultUpdated(const Domain::Tests::Stroke::Result& result)
@@ -670,7 +674,7 @@ void MainWindow::onTelemetryUpdated(const Telemetry& t)
 {
     m_telemetry = t;
 
-    m_mapper->updateInit(t.init);
+    m_mapper->updateInit(t.init, t.valveStrokeRecord);
 
     if (t.testMain) {
         m_mapper->updateMainTest(*t.testMain, t.valveStrokeRecord);
@@ -1282,7 +1286,15 @@ void MainWindow::initCharts()
 
     connect(ui->checkBox_regression, &QCheckBox::checkStateChanged,
             this, [&](int state) {
-                m_chartManager->chart(ChartType::Pressure)->visible(1, state != 0);
+                const bool on = (state != 0);
+                m_chartManager->chart(ChartType::Pressure)->visible(1, on);
+                m_chartManager->chart(ChartType::Pressure)->visible(2, on);
+            });
+
+    connect(ui->pushButton_inistalState, &QPushButton::clicked,
+            this, [this] {
+                if (auto* chart = m_chartManager->chart(ChartType::Pressure))
+                    chart->restoreDraggableSeries();
             });
 }
 

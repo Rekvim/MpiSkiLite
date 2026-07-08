@@ -173,8 +173,6 @@ Device::sensorByAdc(quint8 adc) const
 
 bool Device::initialize()
 {
-    qDebug() << "Device thread:" << this->thread();
-    qDebug() << "Current thread:" << QThread::currentThread();
     emit requestSetAdcPolling(false, kDefaultAdcPollingMs);
 
     if (!m_isConnected) return false;
@@ -254,6 +252,7 @@ void Device::setDacRaw(quint16 value)
         value = m_dacMin;
     if (value > m_dacMax)
         value = m_dacMax;
+
     m_dac->setValue(value);
     emit requestSetDac(m_dac->rawValue());
 }

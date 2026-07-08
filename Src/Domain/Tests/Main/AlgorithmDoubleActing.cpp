@@ -4,8 +4,6 @@ namespace Domain::Tests::Main {
 
 void AlgorithmDoubleActing::run()
 {
-    emit executionStarted();
-
     // Hold at minimum, wait for valve to stabilise
     setDacBlocked(m_params.dac_min, 0, true);
     if (m_terminate) { emit finished(); return; }

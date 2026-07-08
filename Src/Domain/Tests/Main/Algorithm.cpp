@@ -4,18 +4,7 @@
 namespace Domain::Tests::Main {
 void Algorithm::run()
 {
-    emit executionStarted();
-
     const quint16 pointNumbers = m_params.pointNumbers;
-
-    setDacBlocked(m_params.dac_min, 0, true);
-
-    if (m_terminate) {
-        emit finished();
-        return;
-    }
-
-    Sleep(m_params.delay);
 
     qint64 time = QDateTime::currentMSecsSinceEpoch();
 
@@ -41,7 +30,6 @@ void Algorithm::run()
 
     setDacBlocked(m_params.dac_max, 0, true);
 
-    // Важно: сначала Analyzer, потом график.
     emit backwardStrokeStarted();
     emit dublSeries();
 
@@ -61,7 +49,7 @@ void Algorithm::run()
         setDacBlocked(
             dac,
             time < currentTime ? 0 : quint64(time - currentTime)
-            );
+        );
 
         if (m_terminate) {
             emit finished();
@@ -78,10 +66,5 @@ void Algorithm::run()
 
     emit processCompleted();
     emit finished();
-}
-
-void Algorithm::setParameters(Params& params)
-{
-    m_params = params;
 }
 }

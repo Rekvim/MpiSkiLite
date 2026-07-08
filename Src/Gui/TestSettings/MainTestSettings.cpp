@@ -1,6 +1,8 @@
 #include "MainTestSettings.h"
 #include "ui_MainTestSettings.h"
 
+#include <QShowEvent>
+
 MainTestSettings::MainTestSettings(QWidget *parent) :
     BaseSequenceSettingsDialog(parent),
     ui(new Ui::MainTestSettings)
@@ -40,6 +42,14 @@ Domain::Tests::Main::Params
 MainTestSettings::parameters() const
 {
     return readParamsFromUi();
+}
+
+void MainTestSettings::showEvent(QShowEvent* event)
+{
+    BaseSequenceSettingsDialog::showEvent(event);
+
+    ui->timeEdit->setFocus();
+    ui->timeEdit->setSelectedSection(QDateTimeEdit::MinuteSection);
 }
 
 void MainTestSettings::applyValveInfo(const ValveInfo& info)

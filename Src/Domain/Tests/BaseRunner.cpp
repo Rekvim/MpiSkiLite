@@ -2,7 +2,6 @@
 
 #include <QMetaObject>
 #include <QThread>
-#include <QDebug>
 #include "Domain/Mpi/Device.h"
 
 BaseRunner::~BaseRunner()
@@ -32,7 +31,6 @@ void BaseRunner::start()
 
     RunnerConfig cfg = buildConfig();
     if (!cfg.worker) {
-        qWarning() << "[BaseRunner] Cannot start: worker was not created";
         emit endTest();
         return;
     }
@@ -52,11 +50,11 @@ void BaseRunner::start()
     worker->moveToThread(thread);
 
     connect(thread, &QThread::started,
-            worker, &AbstractTestAlgorithm::run);
-
-    connect(worker, &AbstractTestAlgorithm::executionStarted,
             this, &BaseRunner::testActuallyStarted,
             Qt::QueuedConnection);
+
+    connect(thread, &QThread::started,
+            worker, &AbstractTestAlgorithm::run);
 
     connect(worker, &AbstractTestAlgorithm::dacCommandRequested,
             this, &BaseRunner::requestSetDAC,

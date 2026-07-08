@@ -24,7 +24,8 @@ void Analyzer::start()
     m_pressureSeriesFirst.clear();
     m_pressureSeriesSecond.clear();
 
-    m_regressionChartPoints.clear();
+    m_regressionChartPointsForward.clear();
+    m_regressionChartPointsBackward.clear();
     m_frictionChartPoints.clear();
 }
 
@@ -510,25 +511,6 @@ QVector<QPointF> Analyzer::buildRegressionLinePoints(
     return result;
 }
 
-QVector<QPointF> Analyzer::buildRegressionChartPoints(
-    const Regression& regressionFirst,
-    const Regression& regressionSecond,
-    const Limits& limits) const
-{
-    QVector<QPointF> pointsFirst =
-        buildRegressionLinePoints(regressionFirst, limits);
-
-    QVector<QPointF> pointsSecond =
-        buildRegressionLinePoints(regressionSecond, limits);
-
-    pointsFirst.append({pointsSecond.rbegin(), pointsSecond.rend()});
-
-    if (!pointsFirst.isEmpty())
-        pointsFirst.push_back(pointsFirst.first());
-
-    return pointsFirst;
-}
-
 QVector<QPointF> Analyzer::buildFrictionChartPoints(
     const QVector<PressurePoint>& first,
     const QVector<PressurePoint>& second,
@@ -593,9 +575,14 @@ QVector<QPointF> Analyzer::buildFrictionChartPoints(
     return result;
 }
 
-const QVector<QPointF>& Analyzer::regressionChartPoints() const
+const QVector<QPointF>& Analyzer::regressionChartPointsForward() const
 {
-    return m_regressionChartPoints;
+    return m_regressionChartPointsForward;
+}
+
+const QVector<QPointF>& Analyzer::regressionChartPointsBackward() const
+{
+    return m_regressionChartPointsBackward;
 }
 
 const QVector<QPointF>& Analyzer::frictionChartPoints() const
@@ -698,11 +685,12 @@ void Analyzer::finish()
     m_result.springHigh =
         spring.second;
 
-    m_regressionChartPoints =
-        buildRegressionChartPoints(
-            regressionFirst,
-            regressionSecond,
-            pressureLimits);
+    // onSample() пишет прямой ход во "Second", обратный — в "First"
+    m_regressionChartPointsForward =
+        buildRegressionLinePoints(regressionSecond, pressureLimits);
+
+    m_regressionChartPointsBackward =
+        buildRegressionLinePoints(regressionFirst, pressureLimits);
 
     m_frictionChartPoints =
         buildFrictionChartPoints(

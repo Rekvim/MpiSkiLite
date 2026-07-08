@@ -9,7 +9,7 @@ class CyclicTestPositioner : public Domain::Tests::Main::Algorithm
 {
     Q_OBJECT
 public:
-    explicit CyclicTestPositioner(QObject *parent = nullptr);
+    explicit CyclicTestPositioner(Domain::Tests::Main::Params params, QObject *parent = nullptr);
     void run() override;
 
 private:

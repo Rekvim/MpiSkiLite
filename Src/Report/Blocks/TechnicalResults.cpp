@@ -92,10 +92,6 @@ namespace Report::Blocks {
                         f3(main->frictionForce));
         }
 
-        qDebug() << "Время в результатх отчета";
-        qDebug() << t.testStroke->forwardTimeMs;
-        qDebug() << t.testStroke->forwardTimeMs;
-
         if (t.testStroke) {
             writer.cell(m_layout.sheet, m_layout.rowStrokeTime, 5,
                         QTime(0, 0).addMSecs(t.testStroke->forwardTimeMs).toString("mm:ss.zzz"));

@@ -14,6 +14,7 @@ namespace Domain::Measurement {
         [[nodiscard]] qreal value() const;
         [[nodiscard]] qreal valueFromPercent(qreal percent) const;
         [[nodiscard]] qreal percent() const;
+        [[nodiscard]] qreal range() const;
 
         void setValue(quint16 value);
         void setCoefficients(qreal k, qreal b);

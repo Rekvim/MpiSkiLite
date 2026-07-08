@@ -24,6 +24,8 @@ private:
     Domain::Tests::Main::Params readParamsFromUi() const;
 
 protected:
+    void showEvent(QShowEvent* event) override;
+
     virtual QVector<qreal>& sequence() {
         static QVector<qreal> dummy;
         return dummy;

@@ -33,5 +33,4 @@ signals:
                 bool waitForStart = false);
     void UpdateGraph();
     void finished();
-    void executionStarted();
 };

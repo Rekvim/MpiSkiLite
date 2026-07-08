@@ -44,6 +44,8 @@ ValveInfo Mapper::read(const ValveWindow& view)
     v.valveStroke = text(ui->lineEdit_valveStroke);
     v.driveModel = text(ui->lineEdit_driveModel);
 
+    v.driveType = ValveEnums::driveTypeFromCombo(ui->comboBox_driveType);
+
     if (v.driveType == DriveType::DoubleActing) {
         v.driveRangeLow = 0.0;
         v.driveRangeHigh = 0.0;
@@ -60,7 +62,6 @@ ValveInfo Mapper::read(const ValveWindow& view)
 
     v.strokeMovement = ValveEnums::strokeMovementFromCombo(ui->comboBox_strokeMovement);
     v.safePosition = ValveEnums::safePositionFromCombo(ui->comboBox_safePosition);
-    v.driveType = ValveEnums::driveTypeFromCombo(ui->comboBox_driveType);
     v.materialStuffingBoxSeal = ValveEnums::stuffingBoxSealFromCombo(ui->comboBox_materialStuffingBoxSeal);
     v.toolNumber = ValveEnums::toolNumberFromCombo(ui->comboBox_toolNumber);
     v.positionerType = ValveEnums::positionerTypeFromCombo(ui->comboBox_positionerType);
@@ -152,6 +153,13 @@ void Mapper::write(ValveWindow& view, const ValveInfo& v)
     ui->comboBox_driveType->setCurrentIndex(static_cast<int>(v.driveType));
     ui->comboBox_strokeMovement->setCurrentIndex(static_cast<int>(v.strokeMovement));
     ui->comboBox_toolNumber->setCurrentIndex(static_cast<int>(v.toolNumber));
+
+    // setCurrentIndex() выше не эмитит currentIndexChanged(), если индекс не
+    // поменялся (например, у нового клапана тот же toolNumber, что уже был
+    // выставлен) — тогда toolChanged() не вызывается сам и в поле остаётся
+    // "сырое" v.diameterPulley (0, если оно никогда не заполнялось). Вызываем
+    // явно, чтобы поле всегда было согласовано с текущим выбором инструмента.
+    view.toolChanged(static_cast<quint16>(v.toolNumber));
     ui->comboBox_positionerType->setCurrentIndex(static_cast<int>(v.positionerType));
 
     auto& c = v.crossingLimits;

@@ -39,7 +39,7 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab_data">
       <property name="sizePolicy">
@@ -2735,6 +2735,9 @@
                  <property name="styleSheet">
                   <string notr="true">padding: 5px 10px;</string>
                  </property>
+                 <property name="text">
+                  <string>15.0</string>
+                 </property>
                  <property name="alignment">
                   <set>Qt::AlignmentFlag::AlignCenter</set>
                  </property>
@@ -2782,6 +2785,9 @@
                  </property>
                  <property name="styleSheet">
                   <string notr="true">padding: 5px 10px;</string>
+                 </property>
+                 <property name="text">
+                  <string>10.0</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignmentFlag::AlignCenter</set>

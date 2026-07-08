@@ -24,6 +24,13 @@ public:
     void setSeriesMarkersOnly(quint8 seriesN, bool on);
     int seriesCount() const;
     bool isSeriesVisible(int series) const;
+    void setSeriesDraggable(quint8 seriesN, bool draggable);
+    void snapshotDraggableSeries();
+    void restoreDraggableSeries();
+
+signals:
+    void seriesDragged(quint8 seriesN, QList<QPointF> points);
+
 public slots:
     void useTimeaxis(bool);
     void addAxis(QString);
@@ -37,6 +44,22 @@ public slots:
     void autoUpdate(bool);
 
 private:
+    struct DragState {
+        bool active = false;
+        quint8 seriesN = 0;
+        int pointIdx = -1;
+        QPointF prevValue;
+    };
+
+    QSet<quint8> m_draggableSeries;
+    DragState m_drag;
+    QHash<quint8, QList<QPointF>> m_draggableSnapshot;
+
+    int findNearestPointIndex(QPoint mousePos, int* outSeriesN) const;
+    int findNearestDraggableSeries(QPoint mousePos) const;
+    void highlightBendPoints(quint8 seriesN);
+
+
     QTimer m_axisTimer;
     QElapsedTimer m_markerTimer;
     QString m_xMarkerFormat = QStringLiteral("%1");

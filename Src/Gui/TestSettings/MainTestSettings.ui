@@ -65,6 +65,9 @@
              <pointsize>12</pointsize>
             </font>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::FocusPolicy::StrongFocus</enum>
+           </property>
            <property name="styleSheet">
             <string notr="true">padding: 5px 5px;</string>
            </property>

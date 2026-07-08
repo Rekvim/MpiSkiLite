@@ -4,7 +4,8 @@
 #include <QTableWidgetItem>
 #include <QTime>
 
-void TelemetryUiMapper::updateInit(const InitState& init)
+void TelemetryUiMapper::updateInit(const InitState& init,
+                                   const ValveStrokeRecord& strokeResult)
 {
     m_ui->label_deviceStatusValue->setText(init.deviceStatusText);
     m_ui->label_deviceStatusValue->setStyleSheet(
@@ -25,6 +26,9 @@ void TelemetryUiMapper::updateInit(const InitState& init)
     m_ui->label_finalPositionValue->setText(init.finalPositionText);
     m_ui->label_finalPositionValue->setStyleSheet(
         "color:" + init.finalPositionColor.name(QColor::HexRgb));
+
+    m_ui->label_valveStroke_range->setText(strokeResult.range);
+    m_ui->lineEdit_crossingLimits_range_value->setText(strokeResult.range);
 }
 
 void TelemetryUiMapper::updateStrokeTest(const Domain::Tests::Stroke::Result& result)

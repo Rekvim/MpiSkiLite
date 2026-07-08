@@ -36,12 +36,11 @@ RunnerConfig Runner::buildConfig() {
     const quint64 N_values = 3 + 2 * P;
     const quint64 totalMs = 10000ULL + N_values * delay;
 
-    auto worker = std::make_unique<Algorithm>();
     Algorithm::Task task;
     task.delay = p.delay;
-
     task.value = buildSequence(p, m_device, m_normalOpen);
-    worker->setTask(task);
+
+    auto worker = std::make_unique<Algorithm>(task);
 
     return makeConfig(std::move(worker), totalMs, Widgets::Chart::ChartType::Step);
 }

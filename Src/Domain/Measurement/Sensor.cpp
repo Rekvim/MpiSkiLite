@@ -36,6 +36,11 @@ namespace Domain::Measurement {
         return 100.0 * pos / span;
     }
 
+    qreal Sensor::range() const
+    {
+        return m_k * (static_cast<qreal>(m_maxValue) - static_cast<qreal>(m_minValue));
+    }
+
     void Sensor::setValue(quint16 value)
     {
         m_value = value;

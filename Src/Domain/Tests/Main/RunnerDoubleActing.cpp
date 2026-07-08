@@ -24,8 +24,7 @@ RunnerConfig RunnerDoubleActing::buildConfig()
         qMin(m_device.dac()->rawFromValue(p.signal_max),
              m_device.dacMax());
 
-    auto worker = std::make_unique<AlgorithmDoubleActing>();
-    worker->setParameters(p);
+    auto worker = std::make_unique<AlgorithmDoubleActing>(p);
 
     return makeConfig(
         std::move(worker),

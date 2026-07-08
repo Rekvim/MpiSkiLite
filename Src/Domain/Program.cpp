@@ -3,8 +3,7 @@
 #include "Domain/Tests/Context.h"
 
 #include "Domain/Tests/AbstractScenario.h"
-#include "Domain/Tests/ScenarioFactory.h" // !
-#include "Domain/Tests/Main/ScenarioDoubleActing.h"
+#include "Domain/Tests/ScenarioFactory.h"
 
 #include "Domain/Tests/Main/Params.h"
 #include "Domain/Tests/Option/Step/Params.h"
@@ -201,52 +200,46 @@ void Program::updateRealtimeTexts(const Domain::Measurement::Sample& s)
     if (m_isTestRunning && !qIsNaN(s.dac))
         emit setTask(s.dac);
 
-    if (!qIsNaN(s.positionValue))
-    {
+    if (!qIsNaN(s.positionValue)) {
         emit setText(
             TextObjects::LineEdit_linearSensor,
             QString("%1 %2").arg(s.positionValue, 0, 'f', 2).arg(s.positionUnit)
         );
     }
 
-    if (!qIsNaN(s.positionPercent))
-    {
+    if (!qIsNaN(s.positionPercent)) {
         emit setText(
             TextObjects::LineEdit_linearSensorPercent,
             QString("%1 %").arg(s.positionPercent, 0, 'f', 2)
-            );
+        );
     }
 
-    if (!qIsNaN(s.pressure1))
-    {
+    if (!qIsNaN(s.pressure1)) {
         emit setText(
             TextObjects::LineEdit_pressureSensor_1,
             QString("%1 bar").arg(s.pressure1, 0, 'f', 2)
-            );
+        );
     }
 
-    if (!qIsNaN(s.pressure2))
-    {
+    if (!qIsNaN(s.pressure2)) {
         emit setText(
             TextObjects::LineEdit_pressureSensor_2,
             QString("%1 bar").arg(s.pressure2, 0, 'f', 2)
-            );
+        );
     }
 
-    if (!qIsNaN(s.pressure3))
-    {
+    if (!qIsNaN(s.pressure3)) {
         emit setText(
             TextObjects::LineEdit_pressureSensor_3,
             QString("%1 bar").arg(s.pressure3, 0, 'f', 2)
-            );
+        );
     }
 
-    if (!qIsNaN(s.feedbackCurrent))
-    {
+    if (!qIsNaN(s.feedbackCurrent)) {
         emit setText(
             TextObjects::LineEdit_feedback_4_20mA,
             QString("%1 mA").arg(s.feedbackCurrent, 0, 'f', 2)
-            );
+        );
     }
 }
 
@@ -450,7 +443,8 @@ void Program::initialization()
     if (m_patternType == SelectTests::Pattern_B_CVT ||
         m_patternType == SelectTests::Pattern_C_CVT ||
         m_patternType == SelectTests::Pattern_B_SACVT ||
-        m_patternType == SelectTests::Pattern_C_SACVT) {
+        m_patternType == SelectTests::Pattern_C_SACVT ||
+        m_patternType == SelectTests::Pattern_C_SOVT) {
         initializer.recordStrokeRange();
 
         setDacRaw(0, 10000, true);
@@ -524,12 +518,17 @@ void Program::addFriction(const QVector<QPointF> &points)
     emit addPoints(ChartType::Friction, chartPoints);
 }
 
-void Program::addRegression(const QVector<QPointF> &points)
+void Program::addRegression(const QVector<QPointF> &forwardPoints,
+                            const QVector<QPointF> &backwardPoints)
 {
     QVector<Widgets::Chart::Point> chartPoints;
 
-    for (QPointF point : points) {
+    for (QPointF point : forwardPoints) {
         chartPoints.push_back({1, point.x(), point.y()});
+    }
+
+    for (QPointF point : backwardPoints) {
+        chartPoints.push_back({2, point.x(), point.y()});
     }
 
     emit addPoints(ChartType::Pressure, chartPoints);
@@ -561,7 +560,7 @@ void Program::startMainTestDoubleActing(const Tests::Main::Params& params)
         makeContext(),
         params,
         this
-        );
+    );
 
     startScenario(std::move(scenario));
 

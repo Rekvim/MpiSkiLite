@@ -51,7 +51,8 @@ signals:
     void pointsRequested(QVector<QVector<QPointF>>& points,
                          Widgets::Chart::ChartType chartType);
 
-    void addRegressionRequested(const QVector<QPointF>& points);
+    void addRegressionRequested(const QVector<QPointF>& forwardPoints,
+                                const QVector<QPointF>& backwardPoints);
     void addFrictionRequested(const QVector<QPointF>& points);
     void duplicateMainChartsSeriesRequested();
 

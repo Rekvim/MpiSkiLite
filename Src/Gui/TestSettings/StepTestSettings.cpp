@@ -64,6 +64,7 @@ StepTestSettings::parameters() const
 
 void StepTestSettings::applyValveInfo(const ValveInfo& info)
 {
+
     if (info.safePosition == SafePosition::NormallyOpen)
         reverseSequence();
 }

@@ -56,7 +56,7 @@
        <enum>Qt::FocusPolicy::StrongFocus</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_manual">
        <property name="focusPolicy">
@@ -1592,7 +1592,7 @@
           <item>
            <widget class="QTabWidget" name="tabWidget_mainTests">
             <property name="currentIndex">
-             <number>1</number>
+             <number>3</number>
             </property>
             <widget class="QWidget" name="tab_mainTests_task">
              <attribute name="title">
@@ -1693,6 +1693,12 @@
                    </property>
                    <item>
                     <widget class="QCheckBox" name="checkBox_showCurve_task">
+                     <property name="font">
+                      <font>
+                       <family>Segoe UI</family>
+                       <pointsize>10</pointsize>
+                      </font>
+                     </property>
                      <property name="text">
                       <string>Задание</string>
                      </property>
@@ -1703,6 +1709,12 @@
                    </item>
                    <item>
                     <widget class="QCheckBox" name="checkBox_showCurve_moving">
+                     <property name="font">
+                      <font>
+                       <family>Segoe UI</family>
+                       <pointsize>10</pointsize>
+                      </font>
+                     </property>
                      <property name="text">
                       <string>Датчик линейных перемещений</string>
                      </property>
@@ -1713,6 +1725,12 @@
                    </item>
                    <item>
                     <widget class="QCheckBox" name="checkBox_showCurve_pressure_1">
+                     <property name="font">
+                      <font>
+                       <family>Segoe UI</family>
+                       <pointsize>10</pointsize>
+                      </font>
+                     </property>
                      <property name="text">
                       <string>Датчик давления 1</string>
                      </property>
@@ -1726,6 +1744,12 @@
                    </item>
                    <item>
                     <widget class="QCheckBox" name="checkBox_showCurve_pressure_2">
+                     <property name="font">
+                      <font>
+                       <family>Segoe UI</family>
+                       <pointsize>10</pointsize>
+                      </font>
+                     </property>
                      <property name="text">
                       <string>Датчик давления 2</string>
                      </property>
@@ -1742,6 +1766,12 @@
                      <property name="enabled">
                       <bool>true</bool>
                      </property>
+                     <property name="font">
+                      <font>
+                       <family>Segoe UI</family>
+                       <pointsize>10</pointsize>
+                      </font>
+                     </property>
                      <property name="text">
                       <string>Датчик давления 3</string>
                      </property>
@@ -1754,6 +1784,22 @@
                     </widget>
                    </item>
                   </layout>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_commentMainTest">
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">padding: 5px 10px;</string>
+                  </property>
+                  <property name="text">
+                   <string>Комментарий к тесту</string>
+                  </property>
                  </widget>
                 </item>
                 <item>
@@ -1887,6 +1933,13 @@
                   </property>
                   <property name="tristate">
                    <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_inistalState">
+                  <property name="text">
+                   <string>Вернуть в исходное состояние</string>
                   </property>
                  </widget>
                 </item>
@@ -3557,7 +3610,7 @@ Border-radius: 10px;
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QPushButton" name="pushButton_commentMainTest">
+           <widget class="QPushButton" name="pushButton_mainTest_continue">
             <property name="font">
              <font>
               <family>Segoe UI</family>
@@ -3566,31 +3619,6 @@ Border-radius: 10px;
             </property>
             <property name="styleSheet">
              <string notr="true">padding: 5px 10px;</string>
-            </property>
-            <property name="text">
-             <string>Комментарий к тесту</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_mainTest_continue">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="font">
-             <font>
-              <family>Segoe UI</family>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="visible">
-             <bool>false</bool>
-            </property>
-            <property name="styleSheet">
-             <string>padding: 5px 10px; background-color: #4CAF50; color: white;</string>
             </property>
             <property name="text">
              <string>Продолжить</string>
@@ -3684,7 +3712,7 @@ Border-radius: 10px;
         <item>
          <widget class="QTabWidget" name="tabWidget_optionalTests">
           <property name="currentIndex">
-           <number>3</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="tab_optionalTests_response">
            <attribute name="title">

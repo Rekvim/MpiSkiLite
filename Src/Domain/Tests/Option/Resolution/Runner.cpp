@@ -11,7 +11,6 @@ RunnerConfig Runner::buildConfig()
     if (p.points.empty())
         return {};
 
-    auto worker = std::make_unique<Algorithm>();
     Algorithm::Task task;
     task.delay = p.delay;
 
@@ -42,7 +41,7 @@ RunnerConfig Runner::buildConfig()
 
     task.value.push_back(m_device.dac()->rawFromValue(4.0));
 
-    worker->setTask(task);
+    auto worker = std::make_unique<Algorithm>(task);
 
     const quint64 P = static_cast<quint64>(p.points.size());
     const quint64 S = static_cast<quint64>(p.steps.size());

@@ -11,7 +11,8 @@ class TelemetryUiMapper
 public:
     TelemetryUiMapper(Ui::MainWindow* ui) : m_ui(ui) { }
 
-    void updateInit(const InitState& init);
+    void updateInit(const InitState& init,
+                    const ValveStrokeRecord& strokeResult);
 
     void updateMainTest(const Domain::Tests::Main::Result& mainResult,
                         const ValveStrokeRecord& strokeResult);
